@@ -1,0 +1,6 @@
+[package]
+name = "fux_delaunay"
+version = "0.1.0"
+authors = ["fulara <ntszar@gmail.com>"]
+
+[dependencies]
