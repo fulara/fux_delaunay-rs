@@ -1,7 +1,9 @@
 use math::*;
-pub type Point2 = ::cgmath::Point2<f64>;
+use cgmath::EuclideanSpace;
+use cgmath::InnerSpace;
+use types::Point2;
 
-struct Triangle {
+pub struct Triangle {
     a: usize,
     b: usize,
     c: usize,
@@ -30,6 +32,26 @@ impl Triangle {
     #[inline]
     fn c<'a>(&self, points: &'a Vec<Point2>) -> &'a Point2 {
         &points[self.c]
+    }
+
+    #[inline]
+    fn is_point_inside(&self, points : &Vec<Point2>, p : &Point2) -> bool
+    {
+        let v0 = self.c(points) - self.a(points);
+        let v1 = self.b(points) - self.a(points);
+        let v2 = p - self.a(points);
+
+        let dot00 = v0.dot(v0);
+        let dot01 = v0.dot(v1);
+        let dot02 = v0.dot(v2);
+        let dot11 = v1.dot(v1);
+        let dot12 = v1.dot(v2);
+
+        let inv_denom = 1. / (dot00 * dot11 - dot01 * dot01);
+        let u = (dot11 * dot02 - dot01 * dot12) * inv_denom;
+        let v = (dot00 * dot12 - dot01 * dot02) * inv_denom;
+
+        (u >= 0.) && (v >= 0.) && (u + v <= 1.)
     }
 }
 
@@ -63,6 +85,24 @@ mod triangle {
         assert_eq!(*tr.b(&points), Point2::new(0.,0.));
         assert_eq!(*tr.c(&points), Point2::new(-1.,70.));
     }
+
+    #[test]
+    fn is_point_inside() {
+        let points = vec![ Point2::new(0.,0.),  Point2::new(1.,1.), Point2::new(2.,0.) ];
+        let tr = Triangle::new(&points, 0,1,2);
+
+        assert_eq!(true, tr.is_point_inside(&points, &Point2::new(0.5,0.5)));
+        assert_eq!(true, tr.is_point_inside(&points, &Point2::new(0.1,0.1)));
+        assert_eq!(true, tr.is_point_inside(&points, &Point2::new(0.9,0.9)));
+        assert_eq!(true, tr.is_point_inside(&points, &points[0]));
+        assert_eq!(true, tr.is_point_inside(&points, &points[1]));
+        assert_eq!(true, tr.is_point_inside(&points, &points[2]));
+        assert_eq!(true, tr.is_point_inside(&points, &Point2::new(0.,0.)));
+
+        assert_eq!(false, tr.is_point_inside(&points, &Point2::new(0.5,1.1)));
+        assert_eq!(false, tr.is_point_inside(&points, &Point2::new(-0.0000001,0.)));
+        assert_eq!(false, tr.is_point_inside(&points, &Point2::new(1.1,1.1)));
+        assert_eq!(false, tr.is_point_inside(&points, &Point2::new(-0.5,0.5)));
+
+    }
 }
-
-
