@@ -11,7 +11,7 @@ pub struct Triangle {
 
 impl Triangle {
     #[inline]
-    fn new(points : &Vec<Point2>, a: usize, b: usize, c: usize) -> Triangle {
+    pub fn new(points : &Vec<Point2>, a: usize, b: usize, c: usize) -> Triangle {
         if on_which_side_point_lies(&points[a], &points[b], &points[c]) == PointLiesOnSide::Left {
             Triangle { a: a, b: c, c: b }
         } else {
@@ -20,22 +20,37 @@ impl Triangle {
     }
 
     #[inline]
-    fn a<'a>(&self, points: &'a Vec<Point2>) -> &'a Point2 {
+    pub fn a<'a>(&self, points: &'a Vec<Point2>) -> &'a Point2 {
         &points[self.a]
     }
 
     #[inline]
-    fn b<'a>(&self, points: &'a Vec<Point2>) -> &'a Point2 {
+    pub fn b<'a>(&self, points: &'a Vec<Point2>) -> &'a Point2 {
         &points[self.b]
     }
 
     #[inline]
-    fn c<'a>(&self, points: &'a Vec<Point2>) -> &'a Point2 {
+    pub fn c<'a>(&self, points: &'a Vec<Point2>) -> &'a Point2 {
         &points[self.c]
     }
 
     #[inline]
-    fn is_point_inside(&self, points : &Vec<Point2>, p : &Point2) -> bool
+    pub fn index_a(&self) -> usize {
+        self.a
+    }
+
+    #[inline]
+    pub fn index_b(&self) -> usize {
+        self.b
+    }
+
+    #[inline]
+    pub fn index_c(&self) -> usize {
+        self.c
+    }
+
+    #[inline]
+    pub fn is_point_inside(&self, points : &Vec<Point2>, p : &Point2) -> bool
     {
         let v0 = self.c(points) - self.a(points);
         let v1 = self.b(points) - self.a(points);
