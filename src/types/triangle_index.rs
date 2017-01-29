@@ -1,0 +1,1 @@
+pub struct T2Index(pub usize);

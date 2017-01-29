@@ -89,7 +89,8 @@ fn read_buff<R: Read>(mut reader: BufReader<R>) -> Result<Triangulation, String>
 
 #[cfg(test)]
 mod test {
-    use super::*;
+    use super::read_buff;
+    use std::io::BufReader;
 
     #[test]
     fn test() {

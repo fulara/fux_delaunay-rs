@@ -16,8 +16,6 @@ pub fn on_which_side_point_lies(line_begin: &Point2, line_end: &Point2, point: &
 
     let cross = c0r0 * c1r1 - c1r0 * c0r1;
 
-    println!("cross is {} c0r0 {} c0r1 {}", cross, c0r0, c0r1);
-
     if cross > 0. {
         PointLiesOnSide::Left
     } else if cross < 0. {
@@ -30,6 +28,7 @@ pub fn on_which_side_point_lies(line_begin: &Point2, line_end: &Point2, point: &
 #[cfg(test)]
 mod test {
     use super::*;
+    use types::Point2;
 
     #[test]
     fn on_which_side_point_lies_test() {

@@ -1,5 +1,4 @@
 use math::*;
-use cgmath::EuclideanSpace;
 use cgmath::InnerSpace;
 use types::Point2;
 
@@ -68,11 +67,26 @@ impl Triangle {
 
         (u >= 0.) && (v >= 0.) && (u + v <= 1.)
     }
+
+    #[inline]
+    pub fn create_center_point(&self, points : &Vec<Point2>) -> Point2 {
+        let a = self.a(points);
+        let b = self.b(points);
+        let c = self.c(points);
+
+        Point2::new((a.x + b.x + c.x)/3., (a.y + b.y + c.y)/3.)
+    }
+
+    #[inline]
+    pub fn clone(&self) -> Triangle {
+        Triangle { a : self.a, b : self.b, c : self.c }
+    }
 }
 
 #[cfg(test)]
 mod triangle {
     use super::*;
+    use types::Point2;
     #[test]
     fn abc_get_and_point_order_check() {
         let points = vec![ Point2::new(0.,0.),  Point2::new(2.,2.), Point2::new(1.,0.) ];
