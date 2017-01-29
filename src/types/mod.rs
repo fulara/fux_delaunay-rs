@@ -10,4 +10,5 @@ pub use self::point2::*;
 pub use self::triangulation::*;
 pub use self::n2_index::*;
 pub use self::t3_index::*;
+pub use self::triangulation_neighborhood::*;
 
