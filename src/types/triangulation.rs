@@ -50,14 +50,15 @@ impl Triangulation {
 mod tests {
     use types::Point2;
     use types::Triangle;
+    use types::N2Index;
     use super::*;
 
     #[test]
     fn finding_triangle_containing_point() {
         let mut pts = vec![Point2::new(0.0, 0.0), Point2::new(1.0, 0.0), Point2::new(0.0, 1.0), Point2::new(1.0, 1.0)];
 
-        let t0 = Triangle::new(&pts, 0, 1, 2);
-        let t1 = Triangle::new(&pts, 1, 2, 3);
+        let t0 = Triangle::new(&pts, N2Index(0),N2Index(1),N2Index(2));
+        let t1 = Triangle::new(&pts, N2Index(1),N2Index(2),N2Index(3));
 
         let mut triangles = vec![t0.clone(), t1.clone()];
 

@@ -1,1 +1,0 @@
-pub struct N2Index(pub usize);

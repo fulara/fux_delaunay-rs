@@ -1,8 +1,10 @@
 use types::Point2;
+use types::N2Index;
+use types::T3Index;
 use types::Triangle;
 
 pub struct TriangulationNeighborhood {
-    triangle_neighborhood: Vec<Vec<(usize, Option<usize>, Option<usize>)>>,
+    triangle_neighborhood: Vec<Vec<(N2Index, Option<T3Index>, Option<T3Index>)>>,
 }
 
 impl TriangulationNeighborhood {
@@ -10,16 +12,16 @@ impl TriangulationNeighborhood {
         TriangulationNeighborhood { triangle_neighborhood: Vec::new() }
     }
 
-    pub fn register_triangle(&mut self, triangle: &Triangle, triangle_index: usize) {
+    pub fn register_triangle(&mut self, triangle: &Triangle, triangle_index: T3Index) {
         self.register_connection(triangle.index_a(), triangle.index_b(), triangle_index);
         self.register_connection(triangle.index_b(), triangle.index_c(), triangle_index);
         self.register_connection(triangle.index_c(), triangle.index_a(), triangle_index);
     }
 
-    pub fn get_neighbor(&self, p1 : usize, p2: usize, triangle_index: usize) -> Option<usize> {
+    pub fn get_neighbor(&self, p1 : N2Index, p2: N2Index, triangle_index: T3Index) -> Option<T3Index> {
         let (smaller, larger) = Self::smaller_larger(p1, p2);
 
-        let v = &self.triangle_neighborhood[smaller];
+        let v = &self.triangle_neighborhood[smaller.0];
 
         for e in v.iter() {
             if e.0 == larger {
@@ -34,14 +36,14 @@ impl TriangulationNeighborhood {
         None
     }
 
-    fn register_connection(&mut self, p1: usize, p2: usize, triangle_index: usize) {
+    fn register_connection(&mut self, p1: N2Index, p2: N2Index, triangle_index: T3Index) {
         let (smaller, larger) = TriangulationNeighborhood::smaller_larger(p1, p2);
 
-        if self.triangle_neighborhood.len() < larger {
-            self.triangle_neighborhood.resize(larger, Vec::new());
+        if self.triangle_neighborhood.len() < larger.0 {
+            self.triangle_neighborhood.resize(larger.0, Vec::new());
         }
 
-        let v = &mut self.triangle_neighborhood[smaller];
+        let v = &mut self.triangle_neighborhood[smaller.0];
 
         for i in 0..v.len() {
             let e = &mut v[i];
@@ -56,7 +58,7 @@ impl TriangulationNeighborhood {
         v.push((larger, Some(triangle_index), None));
     }
 
-    fn smaller_larger(p1: usize, p2: usize) -> (usize, usize) {
+    fn smaller_larger(p1: N2Index, p2: N2Index) -> (N2Index, N2Index) {
         if p1 < p2 { (p1, p2) } else { (p2, p1) }
     }
 }
@@ -65,29 +67,31 @@ impl TriangulationNeighborhood {
 mod tests {
     use types::Point2;
     use types::Triangle;
+    use types::N2Index;
+    use types::T3Index;
     use super::*;
 
     #[test]
     fn testing_neighborhood() {
         let mut pts = vec![Point2::new(0.0, 0.0), Point2::new(1.0, 0.0), Point2::new(0.0, 1.0), Point2::new(1.0, 1.0)];
 
-        let t0 = Triangle::new(&pts, 0, 1, 2);
-        let t1 = Triangle::new(&pts, 1, 2, 3);
+        let t0 = Triangle::new(&pts, N2Index(0), N2Index(1), N2Index(2));
+        let t1 = Triangle::new(&pts, N2Index(1), N2Index(2), N2Index(3));
 
         let mut neighborhood = TriangulationNeighborhood::new();
 
-        neighborhood.register_triangle(&t0, 0);
-        neighborhood.register_triangle(&t1, 1);
+        neighborhood.register_triangle(&t0, T3Index(0));
+        neighborhood.register_triangle(&t1, T3Index(1));
 
-        assert_eq!(Option::None, neighborhood.get_neighbor(0, 1, 0));
-        assert_eq!(Some(1), neighborhood.get_neighbor(1, 2, 0));
-        assert_eq!(Some(1), neighborhood.get_neighbor(2, 1, 0));
-        assert_eq!(Option::None, neighborhood.get_neighbor(2, 0, 0));
+        assert_eq!(Option::None, neighborhood.get_neighbor(N2Index(0), N2Index(1), T3Index(0)));
+        assert_eq!(Some(T3Index(1)), neighborhood.get_neighbor(N2Index(1), N2Index(2), T3Index(0)));
+        assert_eq!(Some(T3Index(1)), neighborhood.get_neighbor(N2Index(2), N2Index(1), T3Index(0)));
+        assert_eq!(Option::None, neighborhood.get_neighbor(N2Index(2), N2Index(0), T3Index(0)));
 
-        assert_eq!(Option::None, neighborhood.get_neighbor(1, 3, 1));
-        assert_eq!(Some(0), neighborhood.get_neighbor(1, 2, 1));
-        assert_eq!(Some(0), neighborhood.get_neighbor(2, 1, 1));
-        assert_eq!(Option::None, neighborhood.get_neighbor(2, 3, 1));
+        assert_eq!(Option::None, neighborhood.get_neighbor(N2Index(1), N2Index(3), T3Index(1)));
+        assert_eq!(Some(T3Index(0)), neighborhood.get_neighbor(N2Index(1), N2Index(2), T3Index(1)));
+        assert_eq!(Some(T3Index(0)), neighborhood.get_neighbor(N2Index(2), N2Index(1), T3Index(1)));
+        assert_eq!(Option::None, neighborhood.get_neighbor(N2Index(2), N2Index(3), T3Index(1)));
 
 
     }

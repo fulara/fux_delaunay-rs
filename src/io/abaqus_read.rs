@@ -70,7 +70,7 @@ fn read_buff<R: Read>(mut reader: BufReader<R>) -> Result<Triangulation, String>
                                 let n2 = split_line[2].trim().parse::<usize>().unwrap() - 1usize;
                                 let n3 = split_line[3].trim().parse::<usize>().unwrap() - 1usize;
 
-                                elements.push(Triangle::new(&nodes, n1, n2, n3));
+                                elements.push(Triangle::new(&nodes, N2Index(n1), N2Index(n2), N2Index(n3)));
                             }
                         }
                     }
@@ -91,6 +91,7 @@ fn read_buff<R: Read>(mut reader: BufReader<R>) -> Result<Triangulation, String>
 mod test {
     use super::read_buff;
     use std::io::BufReader;
+    use types::N2Index;
 
     #[test]
     fn test() {
@@ -125,9 +126,9 @@ mod test {
                 assert_eq!(367., tr.nodes()[2].y);
 
                 assert_eq!(1, tr.elements().len());
-                assert_eq!(0, tr.elements()[0].index_a());
-                assert_eq!(2, tr.elements()[0].index_b());
-                assert_eq!(1, tr.elements()[0].index_c());
+                assert_eq!(N2Index(0), tr.elements()[0].index_a());
+                assert_eq!(N2Index(2), tr.elements()[0].index_b());
+                assert_eq!(N2Index(1), tr.elements()[0].index_c());
             }
             Err(str) => panic!("Expected success here got err: '{}'", str)
         }

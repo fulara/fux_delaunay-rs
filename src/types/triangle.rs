@@ -1,17 +1,19 @@
 use math::*;
 use cgmath::InnerSpace;
 use types::Point2;
+use types::n2_index::N2Index;
+use types::t3_index::T3Index;
 
 pub struct Triangle {
-    a: usize,
-    b: usize,
-    c: usize,
+    a: N2Index,
+    b: N2Index,
+    c: N2Index,
 }
 
 impl Triangle {
     #[inline]
-    pub fn new(points : &Vec<Point2>, a: usize, b: usize, c: usize) -> Triangle {
-        if on_which_side_point_lies(&points[a], &points[b], &points[c]) == PointLiesOnSide::Left {
+    pub fn new(points : &Vec<Point2>, a: N2Index, b: N2Index, c: N2Index) -> Triangle {
+        if on_which_side_point_lies(&points[a.0], &points[b.0], &points[c.0]) == PointLiesOnSide::Left {
             Triangle { a: a, b: c, c: b }
         } else {
             Triangle { a: a, b: b, c: c }
@@ -20,31 +22,31 @@ impl Triangle {
 
     #[inline]
     pub fn a<'a>(&self, points: &'a Vec<Point2>) -> &'a Point2 {
-        &points[self.a]
+        &points[self.a.0]
     }
 
     #[inline]
     pub fn b<'a>(&self, points: &'a Vec<Point2>) -> &'a Point2 {
-        &points[self.b]
+        &points[self.b.0]
     }
 
     #[inline]
     pub fn c<'a>(&self, points: &'a Vec<Point2>) -> &'a Point2 {
-        &points[self.c]
+        &points[self.c.0]
     }
 
     #[inline]
-    pub fn index_a(&self) -> usize {
+    pub fn index_a(&self) -> N2Index {
         self.a
     }
 
     #[inline]
-    pub fn index_b(&self) -> usize {
+    pub fn index_b(&self) -> N2Index {
         self.b
     }
 
     #[inline]
-    pub fn index_c(&self) -> usize {
+    pub fn index_c(&self) -> N2Index {
         self.c
     }
 
@@ -87,12 +89,13 @@ impl Triangle {
 mod triangle {
     use super::*;
     use types::Point2;
+    use types::n2_index::N2Index;
     #[test]
     fn abc_get_and_point_order_check() {
         let points = vec![ Point2::new(0.,0.),  Point2::new(2.,2.), Point2::new(1.,0.) ];
 
-        let tr = Triangle::new(&points, 0,1,2);
-        let tr2 = Triangle::new(&points, 0,2,1);
+        let tr = Triangle::new(&points, N2Index(0),N2Index(1),N2Index(2));
+        let tr2 = Triangle::new(&points, N2Index(0),N2Index(2),N2Index(1));
 
         assert_eq!(*tr.a(&points), Point2::new(0.,0.));
         assert_eq!(*tr.b(&points), Point2::new(2.,2.));
@@ -108,7 +111,7 @@ mod triangle {
     fn points_are_put_in_clockwise_order() {
         let points = vec![ Point2::new(5.,5.),  Point2::new(-1.,70.), Point2::new(0.,0.) ];
 
-        let tr = Triangle::new(&points, 0,1,2);
+        let tr = Triangle::new(&points, N2Index(0),N2Index(1),N2Index(2));
 
         assert_eq!(*tr.a(&points), Point2::new(5.,5.));
         assert_eq!(*tr.b(&points), Point2::new(0.,0.));
@@ -118,7 +121,7 @@ mod triangle {
     #[test]
     fn is_point_inside() {
         let points = vec![ Point2::new(0.,0.),  Point2::new(1.,1.), Point2::new(2.,0.) ];
-        let tr = Triangle::new(&points, 0,1,2);
+        let tr = Triangle::new(&points, N2Index(0),N2Index(1),N2Index(2));
 
         assert_eq!(true, tr.is_point_inside(&points, &Point2::new(0.5,0.5)));
         assert_eq!(true, tr.is_point_inside(&points, &Point2::new(0.1,0.1)));
