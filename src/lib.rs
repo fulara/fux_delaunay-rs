@@ -1,8 +1,8 @@
 extern crate cgmath;
 
-mod math;
-mod types;
-mod io;
+pub mod math;
+pub mod types;
+pub mod io;
 
 #[cfg(test)]
 mod tests {

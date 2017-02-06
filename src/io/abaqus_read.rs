@@ -7,7 +7,7 @@ use std::io::Read;
 pub fn load_from_abaqus_format(path_to_file: &str) -> Result<Triangulation, String> {
     let f = match File::open(path_to_file) {
         Ok(file) => file,
-        Err(e) => return Err("failed to open file".to_owned())
+        Err(_) => return Err("failed to open file".to_owned())
     };
 
     let mut fbuf = BufReader::new(f);
@@ -81,7 +81,7 @@ fn read_buff<R: Read>(mut reader: BufReader<R>) -> Result<Triangulation, String>
     }
 
     match state {
-        ParserState::AfterElements | ParserState::Elements => Ok(Triangulation::new(nodes, elements)),
+        ParserState::AfterElements | ParserState::Elements => Ok(Triangulation::new_from_prebuilt_triangulation(nodes, elements)),
         _ => Err("failed to parse file".to_owned()),
     }
 }

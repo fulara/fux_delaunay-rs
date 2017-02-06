@@ -1,4 +1,3 @@
-use types::Point2;
 use types::N2Index;
 use types::T3Index;
 use types::Triangle;
@@ -18,7 +17,7 @@ impl TriangulationNeighborhood {
         self.register_connection(triangle.index_c(), triangle.index_a(), triangle_index);
     }
 
-    pub fn get_neighbor(&self, p1 : N2Index, p2: N2Index, triangle_index: T3Index) -> Option<T3Index> {
+    pub fn get_neighbor(&self, p1: N2Index, p2: N2Index, triangle_index: T3Index) -> Option<T3Index> {
         let (smaller, larger) = Self::smaller_larger(p1, p2);
 
         let v = &self.triangle_neighborhood[smaller.0];
@@ -28,12 +27,33 @@ impl TriangulationNeighborhood {
                 if e.1 == Some(triangle_index) {
                     return e.2;
                 } else {
-                    e.1;
+                    return e.1;
                 }
             }
         }
 
         None
+    }
+
+    pub fn teach_triangles_of_neighborhood(&self, elements: &mut Vec<Triangle>) {
+        for n_smaller_index in 0..self.triangle_neighborhood.len() {
+            for &(n_larger_index, opt_t1, opt_t2) in &self.triangle_neighborhood[n_smaller_index] {
+                if let (Some(t1), Some(t2)) = (opt_t1, opt_t2) {
+                    {
+                        let el1: &mut Triangle = &mut elements[t1.0];
+                        let neighbor_index = el1.get_neighbor_index(N2Index(n_smaller_index), n_larger_index);
+
+                        el1.set_neighbor(neighbor_index, t2);
+                    }
+                    {
+                        let el2: &mut Triangle = &mut elements[t2.0];
+                        let neighbor_index = el2.get_neighbor_index(N2Index(n_smaller_index), n_larger_index);
+
+                        el2.set_neighbor(neighbor_index, t1);
+                    }
+                }
+            }
+        }
     }
 
     fn register_connection(&mut self, p1: N2Index, p2: N2Index, triangle_index: T3Index) {
@@ -93,6 +113,16 @@ mod tests {
         assert_eq!(Some(T3Index(0)), neighborhood.get_neighbor(N2Index(2), N2Index(1), T3Index(1)));
         assert_eq!(Option::None, neighborhood.get_neighbor(N2Index(2), N2Index(3), T3Index(1)));
 
+        let mut tr = vec![t0, t1];
 
+        neighborhood.teach_triangles_of_neighborhood(&mut tr);
+
+        assert_eq!(Some(T3Index(1)),tr[0].get_neighbor(1));
+        assert_eq!(None,tr[0].get_neighbor(0));
+        assert_eq!(None,tr[0].get_neighbor(2));
+
+        assert_eq!(None,tr[1].get_neighbor(1));
+        assert_eq!(Some(T3Index(0)),tr[1].get_neighbor(0));
+        assert_eq!(None,tr[1].get_neighbor(2));
     }
 }

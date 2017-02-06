@@ -1,3 +1,3 @@
-mod abaqus_read;
+pub mod abaqus_read;
 
 use self::abaqus_read::*;
