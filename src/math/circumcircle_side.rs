@@ -10,6 +10,7 @@ pub enum CircleSide {
 }
 
 pub fn which_side_of_circumcircle(p: &Point2, q: &Point2, r: &Point2, t: &Point2) -> CircleSide {
+    //TODO the algorithm is taken from CGAL for now. rewrite.
     let qpx = q.x - p.x;
     let qpy = q.y - p.y;
     let rpx = r.x - p.x;
@@ -57,17 +58,16 @@ pub fn which_side_of_circumcircle(p: &Point2, q: &Point2, r: &Point2, t: &Point2
             //should be on boundary here, treat this case as OK.
             return CircleSide::Outside;
         }
-    } else if maxy < 1e76 /* sqrt(sqrt(max_double/16 [hadamard])) */ {
-        let eps = 8.8878565762001373e-15 * maxx * maxy * (maxy * maxy);
-        if det > eps {
+    } else if maxy < 1e76 {
+        //this is tricky one. I am assuming here that if everything is so close to the edge then its OUTSIDE the circle.
+        if det >= -1e-6 {
             return CircleSide::Outside;
-        }
-        if det < -eps {
+        } else {
             return CircleSide::Inside;
         }
     }
 
-    panic!("which_side_of_circumcircle unexpected");
+    panic!("which_side_of_circumcircle unexpected maxx{} maxy{} det{}", maxx, maxy, det);
 }
 
 #[cfg(test)]
@@ -76,6 +76,13 @@ mod tests {
     use ::types::Point2;
     use ::types::Triangle;
     use ::types::N2Index;
+
+    use cgmath::Rad;
+    use cgmath::Vector2;
+    use cgmath::{Matrix, Matrix2};
+    use cgmath::{Rotation, Rotation2, Basis2};
+    use cgmath::ApproxEq;
+    use std::f64;
 
     #[test]
     fn testing_circumside() {
@@ -94,11 +101,59 @@ mod tests {
 
     #[test]
     fn testing_with_triangle() {
-        let nodes = vec!(Point2::new(0.,0.),Point2::new(1.,1.), Point2::new(2.,0.));
+        let nodes = vec!(Point2::new(0., 0.), Point2::new(1., 1.), Point2::new(2., 0.));
 
         let tr = Triangle::new(&nodes, N2Index(0), N2Index(1), N2Index(2));
 
         assert_eq!(CircleSide::Inside, which_side_of_circumcircle(&tr.a(&nodes), &tr.b(&nodes), &tr.c(&nodes), &Point2::new(0.5, 0.5)));
         assert_eq!(CircleSide::Outside, which_side_of_circumcircle(&tr.a(&nodes), &tr.b(&nodes), &tr.c(&nodes), &Point2::new(1.1, 1.1)));
+    }
+
+
+    quickcheck! {
+    fn quick_check_test(x: f64, y: f64, r: f64) -> bool {
+        if r < 0.2 {
+            return true;
+        }
+
+        let rotation: Basis2<f64> = Rotation2::from_angle(Rad(-f64::consts::FRAC_PI_2));
+        let one_hundreth_pi_rotattion: Basis2<f64> = Rotation2::from_angle(Rad(-f64::consts::PI / 100.));
+
+        let p = Point2::new(x + r, y);
+        let p0 = rotation.rotate_point(Point2::new(r, 0.));
+        let p1 = rotation.rotate_point(p0);
+        let p2 = rotation.rotate_point(p1);
+
+        let p0 = Point2::new(p0.x  + p.x, p0.y + p.y);
+        let p1 = Point2::new(p1.x  + p.x, p1.y + p.y);
+        let p2 = Point2::new(p2.x  + p.x, p2.y + p.y);
+
+
+        for i in 1..20 {
+            let multiplier = 0.1 * i as f64;
+
+            let mut rotated_point = Point2::new(r * multiplier, 0.);
+
+            for _ in 0 .. 200 {
+                rotated_point = one_hundreth_pi_rotattion.rotate_point(rotated_point);
+
+                let tested_point = Point2::new(rotated_point.x + p.x, rotated_point.y + p.y);
+                let side = which_side_of_circumcircle(&p0, &p1, &p2, &tested_point);
+
+                if multiplier < 0.99 {
+
+                    if side != CircleSide::Inside {
+                        return false;
+                    }
+                } else {
+                      if side != CircleSide::Outside {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        true
+    }
     }
 }
