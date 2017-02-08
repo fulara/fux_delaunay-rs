@@ -112,7 +112,7 @@ mod tests {
 
     quickcheck! {
     fn quick_check_test(x: f64, y: f64, r: f64) -> bool {
-        if r < 0.2 {
+        if r < 0.00001 {
             return true;
         }
 
