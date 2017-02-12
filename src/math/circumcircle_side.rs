@@ -53,8 +53,6 @@ pub fn which_side_of_circumcircle(p: &Point2, q: &Point2, r: &Point2, t: &Point2
 
     if maxx > maxy { mem::swap(&mut maxx, &mut maxy) };
 
-    println!("checking side for: {:?}   {:?}  {:?}  {:?}   det:{}", p,q,r,t, det);
-
     if maxx < 1e-73 {
         if maxx == 0. {
             //should be on boundary here, treat this case as OK.
@@ -63,10 +61,8 @@ pub fn which_side_of_circumcircle(p: &Point2, q: &Point2, r: &Point2, t: &Point2
     } else if maxy < 1e76 {
         //this is tricky one. I am assuming here that if everything is so close to the edge then its OUTSIDE the circle.
         if det >= -1e-6 {
-            println!("outside.");
             return CircleSide::Outside;
         } else {
-            println!("inside.");
             return CircleSide::Inside;
         }
     }
