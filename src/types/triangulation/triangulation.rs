@@ -33,6 +33,20 @@ impl Triangulation {
     pub fn elements(&self) -> &Vec<Triangle> {
         &self.elements
     }
+
+    #[inline]
+    pub fn elements_mut(&mut self) -> &mut Vec<Triangle> {
+        &mut self.elements
+    }
+
+    #[inline]
+    pub fn is_inside_circumcircle(&self, tr : &Triangle, p :&Point2) -> bool {
+        let a = tr.a(self.nodes());
+        let b = tr.b(self.nodes());
+        let c = tr.c(self.nodes());
+
+        ::math::which_side_of_circumcircle(a,b,c,p) == ::math::CircleSide::Inside
+    }
 }
 
 #[cfg(test)]
@@ -41,7 +55,4 @@ mod tests {
     use types::Triangle;
     use types::N2Index;
     use types::T3Index;
-    use types::element_locators;
-    use types::element_locators::LocationResult;
-    use super::*;
 }

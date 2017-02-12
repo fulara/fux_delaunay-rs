@@ -43,13 +43,13 @@ impl TriangulationNeighborhood {
                         let el1: &mut Triangle = &mut elements[t1.0];
                         let neighbor_index = el1.get_neighbor_index(N2Index(n_smaller_index), n_larger_index);
 
-                        el1.set_neighbor(neighbor_index, t2);
+                        el1.set_neighbor(neighbor_index, Some(t2));
                     }
                     {
                         let el2: &mut Triangle = &mut elements[t2.0];
                         let neighbor_index = el2.get_neighbor_index(N2Index(n_smaller_index), n_larger_index);
 
-                        el2.set_neighbor(neighbor_index, t1);
+                        el2.set_neighbor(neighbor_index, Some(t1));
                     }
                 }
             }
@@ -117,12 +117,12 @@ mod tests {
 
         neighborhood.teach_triangles_of_neighborhood(&mut tr);
 
-        assert_eq!(Some(T3Index(1)),tr[0].get_neighbor(1));
-        assert_eq!(None,tr[0].get_neighbor(0));
-        assert_eq!(None,tr[0].get_neighbor(2));
+        assert_eq!(Some(T3Index(1)),tr[0].get_neighbor_from_index(1));
+        assert_eq!(None,tr[0].get_neighbor_from_index(0));
+        assert_eq!(None,tr[0].get_neighbor_from_index(2));
 
-        assert_eq!(None,tr[1].get_neighbor(1));
-        assert_eq!(Some(T3Index(0)),tr[1].get_neighbor(0));
-        assert_eq!(None,tr[1].get_neighbor(2));
+        assert_eq!(None,tr[1].get_neighbor_from_index(1));
+        assert_eq!(Some(T3Index(0)),tr[1].get_neighbor_from_index(0));
+        assert_eq!(None,tr[1].get_neighbor_from_index(2));
     }
 }

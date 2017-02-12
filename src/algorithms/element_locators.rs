@@ -28,9 +28,9 @@ pub fn locate_element_containing(elements: &Vec<Triangle>, nodes: &Vec<Point2>, 
 
             match math::on_which_side_point_lies(edge.0, edge.1, p) {
                 math::PointLiesOnSide::Left => {
-                    assert!(ele.get_neighbor(current_edge).is_some());
+                    assert!(ele.get_neighbor_from_index(current_edge).is_some());
 
-                    ele_index = ele.get_neighbor(current_edge).unwrap();
+                    ele_index = ele.get_neighbor_from_index(current_edge).unwrap();
                     break;
                 }
                 math::PointLiesOnSide::OnLine => {
@@ -53,9 +53,8 @@ mod tests {
     use types::Triangle;
     use types::N2Index;
     use types::T3Index;
-    use types::element_locators;
-    use types::element_locators::LocationResult;
     use types::Triangulation;
+    use super::*;
 
     #[test]
     fn locator_test() {
@@ -71,9 +70,9 @@ mod tests {
         let center0 = t0.create_center_point(&pts);
         let center1 = t1.create_center_point(&pts);
 
-        assert_eq! (LocationResult::InElement(T3Index(0)), element_locators::locate_element_containing(triangulation.elements(), triangulation.nodes(), &center0));
-        assert_eq!(LocationResult::InElement(T3Index(1)), element_locators::locate_element_containing(triangulation.elements(), triangulation.nodes(), &center1));
+        assert_eq! (LocationResult::InElement(T3Index(0)), locate_element_containing(triangulation.elements(), triangulation.nodes(), &center0));
+        assert_eq!(LocationResult::InElement(T3Index(1)), locate_element_containing(triangulation.elements(), triangulation.nodes(), &center1));
 
-        assert_eq! (LocationResult::OnEdge(T3Index(0)), element_locators::locate_element_containing(triangulation.elements(), triangulation.nodes(), &Point2::new(0.5, 0.)));
+        assert_eq! (LocationResult::OnEdge(T3Index(0)), locate_element_containing(triangulation.elements(), triangulation.nodes(), &Point2::new(0.5, 0.)));
     }
 }

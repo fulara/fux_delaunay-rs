@@ -53,6 +53,8 @@ pub fn which_side_of_circumcircle(p: &Point2, q: &Point2, r: &Point2, t: &Point2
 
     if maxx > maxy { mem::swap(&mut maxx, &mut maxy) };
 
+    println!("checking side for: {:?}   {:?}  {:?}  {:?}   det:{}", p,q,r,t, det);
+
     if maxx < 1e-73 {
         if maxx == 0. {
             //should be on boundary here, treat this case as OK.
@@ -61,8 +63,10 @@ pub fn which_side_of_circumcircle(p: &Point2, q: &Point2, r: &Point2, t: &Point2
     } else if maxy < 1e76 {
         //this is tricky one. I am assuming here that if everything is so close to the edge then its OUTSIDE the circle.
         if det >= -1e-6 {
+            println!("outside.");
             return CircleSide::Outside;
         } else {
+            println!("inside.");
             return CircleSide::Inside;
         }
     }
@@ -110,7 +114,7 @@ mod tests {
     }
 
 
-    quickcheck! {
+    #[quickcheck]
     fn quick_check_test(x: f64, y: f64, r: f64) -> bool {
         if r < 0.00001 {
             return true;
@@ -124,9 +128,9 @@ mod tests {
         let p1 = rotation.rotate_point(p0);
         let p2 = rotation.rotate_point(p1);
 
-        let p0 = Point2::new(p0.x  + p.x, p0.y + p.y);
-        let p1 = Point2::new(p1.x  + p.x, p1.y + p.y);
-        let p2 = Point2::new(p2.x  + p.x, p2.y + p.y);
+        let p0 = Point2::new(p0.x + p.x, p0.y + p.y);
+        let p1 = Point2::new(p1.x + p.x, p1.y + p.y);
+        let p2 = Point2::new(p2.x + p.x, p2.y + p.y);
 
 
         for i in 1..20 {
@@ -134,26 +138,20 @@ mod tests {
 
             let mut rotated_point = Point2::new(r * multiplier, 0.);
 
-            for _ in 0 .. 200 {
+            for _ in 0..200 {
                 rotated_point = one_hundreth_pi_rotattion.rotate_point(rotated_point);
 
                 let tested_point = Point2::new(rotated_point.x + p.x, rotated_point.y + p.y);
                 let side = which_side_of_circumcircle(&p0, &p1, &p2, &tested_point);
 
                 if multiplier < 0.99 {
-
-                    if side != CircleSide::Inside {
-                        return false;
-                    }
+                    assert_eq!(CircleSide::Inside, side);
                 } else {
-                      if side != CircleSide::Outside {
-                        return false;
-                    }
+                    assert_eq!(CircleSide::Outside, side);
                 }
             }
         }
 
         true
-    }
     }
 }
