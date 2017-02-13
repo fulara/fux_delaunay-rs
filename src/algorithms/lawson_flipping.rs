@@ -1,19 +1,14 @@
 use ::types::*;
 use ::math::*;
 
-struct Flipper {}
-
-impl Flipper {}
-
-
-pub fn perform_flip(triangulation: &mut Triangulation, bottom_node_index: N2Index, bottom_element_index: T3Index) -> bool {
+pub fn perform_flip(triangulation: &mut Triangulation, bottom_node_index: N2Index, bottom_element_index: T3Index) -> Option<(T3Index, T3Index)> {
     let (common1, common2, top_element_index) =
     {
         let tr: &Triangle = &triangulation.elements()[bottom_element_index.0];
         let (left_common_node, right_common_node) = tr.get_others_two_nodes(bottom_node_index);
         let neighbor_opt = tr.get_neighor_for_nodes(left_common_node, right_common_node);
         if neighbor_opt.is_none() {
-            return false;
+            return None;
         }
 
         (left_common_node, right_common_node, neighbor_opt.unwrap())
@@ -23,7 +18,7 @@ pub fn perform_flip(triangulation: &mut Triangulation, bottom_node_index: N2Inde
         let node = &triangulation.nodes()[bottom_node_index.0];
         let neighbor = &triangulation.elements()[top_element_index.0];
         if !triangulation.is_inside_circumcircle(neighbor, node) {
-            return false;
+            return None;
         }
     }
 
@@ -39,50 +34,37 @@ pub fn perform_flip(triangulation: &mut Triangulation, bottom_node_index: N2Inde
         (bottom_triangle.get_neighor_for_nodes(common1, bottom_node_index), top_triangle.get_neighor_for_nodes(common2, top_node_index))
     };
 
-    {
-        {
-            let bottom_element: &mut Triangle = &mut triangulation.elements_mut()[bottom_element_index.0];
+    perform_swap_update_connections(triangulation, bottom_element_index, top_element_index, c2_top_neighbor_index, common1, common2, bottom_node_index, top_node_index);
+    perform_swap_update_connections(triangulation, top_element_index, bottom_element_index, c1_bottom_neighbor_index, common2, common1, top_node_index, bottom_node_index);
 
-            update_neighbor(bottom_element, common1, common2, c2_top_neighbor_index);
-            update_neighbor(bottom_element, bottom_node_index, common1, Some(top_element_index));
-
-            bottom_element.swap_node(common1, top_node_index);
-        }
-        {
-            if let Some(c2_top_neighbor_index) = c2_top_neighbor_index {
-                let c2_top_neighbor: &mut Triangle = &mut triangulation.elements_mut()[c2_top_neighbor_index.0];
-                update_neighbor(c2_top_neighbor, top_node_index, common2, Some(bottom_element_index));
-            }
-        }
-        let bottom_element: &Triangle = &triangulation.elements()[bottom_element_index.0];
-        bottom_element.assert_order(triangulation.nodes());
-    }
-
-    {
-        {
-            let top_element: &mut Triangle = &mut triangulation.elements_mut()[top_element_index.0];
-
-            update_neighbor(top_element, top_node_index, common2, Some(bottom_element_index));
-            update_neighbor(top_element, common1, common2, c1_bottom_neighbor_index);
-
-            top_element.swap_node(common2, bottom_node_index);
-        }
-        {
-            if let Some(c1_bottom_neighbor_index) = c1_bottom_neighbor_index {
-                let c1_bottom_neighbor: &mut Triangle = &mut triangulation.elements_mut()[c1_bottom_neighbor_index.0];
-                update_neighbor(c1_bottom_neighbor, common1, bottom_node_index, Some(top_element_index));
-            }
-        }
-        let top_element: &Triangle = &triangulation.elements()[top_element_index.0];
-        top_element.assert_order(triangulation.nodes());
-    }
-
-    true
+    Some((top_element_index, bottom_element_index))
 }
 
 fn update_neighbor(for_element: &mut Triangle, n1: N2Index, n2: N2Index, update_with: Option<T3Index>) {
     let neighbor_index = for_element.get_neighbor_index(n1, n2);
     for_element.set_neighbor(neighbor_index, update_with);
+}
+
+fn perform_swap_update_connections(triangulation: &mut Triangulation, element_to_swap_index: T3Index,
+                                   element_swapping_with: T3Index, changing_neighborhood_element_index: Option<T3Index>,
+                                   common_node_being_swapped_out: N2Index, common_node: N2Index,
+                                   last_element_node_index: N2Index, node_being_swapped_in: N2Index) {
+    {
+        let element_being_swapped: &mut Triangle = &mut triangulation.elements_mut()[element_to_swap_index.0];
+
+        update_neighbor(element_being_swapped, common_node_being_swapped_out, common_node, changing_neighborhood_element_index);
+        update_neighbor(element_being_swapped, last_element_node_index, common_node_being_swapped_out, Some(element_swapping_with));
+
+        element_being_swapped.swap_node(common_node_being_swapped_out, node_being_swapped_in);
+    }
+    {
+        if let Some(changing_neighborhood_element_index) = changing_neighborhood_element_index {
+            let changing_neighborhood_element: &mut Triangle = &mut triangulation.elements_mut()[changing_neighborhood_element_index.0];
+            update_neighbor(changing_neighborhood_element, node_being_swapped_in, common_node, Some(element_to_swap_index));
+        }
+    }
+    let element_being_swapped: &Triangle = &triangulation.elements()[element_to_swap_index.0];
+    element_being_swapped.assert_order(triangulation.nodes());
 }
 
 #[cfg(test)]
@@ -98,7 +80,7 @@ mod tests {
         let mut triangulation = Triangulation::new_from_prebuilt_triangulation(points, eles);
         let x = perform_flip(&mut triangulation, N2Index(3), T3Index(0));
 
-        assert_eq!(false, x);
+        assert_eq!(None, x);
     }
 
     #[test]
@@ -109,7 +91,7 @@ mod tests {
         let mut triangulation = Triangulation::new_from_prebuilt_triangulation(points, eles);
         let x = perform_flip(&mut triangulation, N2Index(3), T3Index(0));
 
-        assert_eq!(false, x);
+        assert_eq!(None, x);
     }
 
     #[test]
@@ -139,7 +121,7 @@ mod tests {
 
         let x = perform_flip(&mut triangulation, N2Index(3), T3Index(1));
 
-        assert_eq!(true, x);
+        assert_eq!(Some((T3Index(0), T3Index(1))), x);
 
         assert_eq!(Triangle::new_exact([N2Index(0), N2Index(2), N2Index(3)], [Some(T3Index(3)), Some(T3Index(1)), Some(T3Index(4))]), triangulation.elements()[0]);
         assert_eq!(Triangle::new_exact([N2Index(2), N2Index(1), N2Index(3)], [Some(T3Index(2)), Some(T3Index(5)), Some(T3Index(0))]), triangulation.elements()[1]);
@@ -147,6 +129,5 @@ mod tests {
         assert_eq!(Triangle::new_exact([N2Index(5), N2Index(2), N2Index(0)], [None, Some(T3Index(0)), None]), triangulation.elements()[3]);
         assert_eq!(Triangle::new_exact([N2Index(0), N2Index(3), N2Index(6)], [Some(T3Index(0)), None, None]), triangulation.elements()[4]);
         assert_eq!(Triangle::new_exact([N2Index(3), N2Index(1), N2Index(7)], [Some(T3Index(1)), None, None]), triangulation.elements()[5]);
-
     }
 }
