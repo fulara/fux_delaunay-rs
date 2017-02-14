@@ -40,11 +40,6 @@ pub fn perform_flip(triangulation: &mut Triangulation, bottom_node_index: N2Inde
     Some((top_element_index, bottom_element_index))
 }
 
-fn update_neighbor(for_element: &mut Triangle, n1: N2Index, n2: N2Index, update_with: Option<T3Index>) {
-    let neighbor_index = for_element.get_neighbor_index(n1, n2);
-    for_element.set_neighbor(neighbor_index, update_with);
-}
-
 fn perform_swap_update_connections(triangulation: &mut Triangulation, element_to_swap_index: T3Index,
                                    element_swapping_with: T3Index, changing_neighborhood_element_index: Option<T3Index>,
                                    common_node_being_swapped_out: N2Index, common_node: N2Index,
@@ -52,15 +47,15 @@ fn perform_swap_update_connections(triangulation: &mut Triangulation, element_to
     {
         let element_being_swapped: &mut Triangle = &mut triangulation.elements_mut()[element_to_swap_index.0];
 
-        update_neighbor(element_being_swapped, common_node_being_swapped_out, common_node, changing_neighborhood_element_index);
-        update_neighbor(element_being_swapped, last_element_node_index, common_node_being_swapped_out, Some(element_swapping_with));
+        element_being_swapped.update_neighbor(common_node_being_swapped_out, common_node, changing_neighborhood_element_index);
+        element_being_swapped.update_neighbor(last_element_node_index, common_node_being_swapped_out, Some(element_swapping_with));
 
         element_being_swapped.swap_node(common_node_being_swapped_out, node_being_swapped_in);
     }
     {
         if let Some(changing_neighborhood_element_index) = changing_neighborhood_element_index {
             let changing_neighborhood_element: &mut Triangle = &mut triangulation.elements_mut()[changing_neighborhood_element_index.0];
-            update_neighbor(changing_neighborhood_element, node_being_swapped_in, common_node, Some(element_to_swap_index));
+            changing_neighborhood_element.update_neighbor(node_being_swapped_in, common_node, Some(element_to_swap_index));
         }
     }
     let element_being_swapped: &Triangle = &triangulation.elements()[element_to_swap_index.0];

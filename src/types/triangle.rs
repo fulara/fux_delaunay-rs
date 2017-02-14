@@ -22,10 +22,10 @@ impl Triangle {
     }
 
     #[inline]
-    pub fn new_exact(v : [N2Index;3], n: [Option<T3Index>;3] ) -> Triangle {
+    pub fn new_exact(v: [N2Index; 3], n: [Option<T3Index>; 3]) -> Triangle {
         Triangle {
-            v : v,
-            n : n,
+            v: v,
+            n: n,
         }
     }
 
@@ -60,6 +60,23 @@ impl Triangle {
     }
 
     #[inline]
+    pub fn nodes(&self) -> &[N2Index; 3] {
+        &self.v
+    }
+
+    #[inline]
+    pub fn update_nodes(&mut self, a: N2Index, b: N2Index, c: N2Index) {
+        self.v[0] = a;
+        self.v[1] = b;
+        self.v[2] = c;
+    }
+
+    #[inline]
+    pub fn neighbors(&self) -> &[Option<T3Index>; 3] {
+        &self.n
+    }
+
+    #[inline]
     pub fn edges_as_points_tuples<'a>(&self, points: &'a Vec<Point2>) -> [(&'a Point2, &'a Point2); 3] {
         [(self.a(points), self.b(points)), (self.b(points), self.c(points)), (self.c(points), self.a(points))]
     }
@@ -85,11 +102,11 @@ impl Triangle {
     }
 
     #[inline]
-    pub fn is_made_of(&self, nodes: [N2Index;3]) -> bool {
+    pub fn is_made_of(&self, nodes: [N2Index; 3]) -> bool {
         for n2_index in nodes.iter() {
             let mut found = false;
 
-            for i in 0 .. self.v.len() {
+            for i in 0..self.v.len() {
                 if self.v[i] == *n2_index {
                     found = true;
                     break
@@ -148,6 +165,12 @@ impl Triangle {
     }
 
     #[inline]
+    pub fn update_neighbor(&mut self, n1: N2Index, n2: N2Index, update_with: Option<T3Index>) {
+        let neighbor_index = self.get_neighbor_index(n1, n2);
+        self.set_neighbor(neighbor_index, update_with);
+    }
+
+    #[inline]
     pub fn get_others_two_nodes(&self, other_than: N2Index) -> (N2Index, N2Index) {
         for i in 0..self.v.len() {
             if self.v[i] == other_than {
@@ -161,7 +184,7 @@ impl Triangle {
     }
 
     #[inline]
-    pub fn get_other_last_node(&self, other_than1 : N2Index, other_than2 : N2Index) -> N2Index {
+    pub fn get_other_last_node(&self, other_than1: N2Index, other_than2: N2Index) -> N2Index {
         for i in 0..self.v.len() {
             if self.v[i] != other_than1 && self.v[i] != other_than2 {
                 return self.v[i];
@@ -187,7 +210,7 @@ impl Triangle {
 
     #[inline]
     fn get_index_from_n2index(&self, n2_index: N2Index) -> usize {
-        for i in 0 .. self.v.len() {
+        for i in 0..self.v.len() {
             if self.v[i] == n2_index {
                 return i;
             }
@@ -197,7 +220,7 @@ impl Triangle {
     }
 
     #[inline]
-    pub fn swap_node(&mut self, to_swap : N2Index, swap_with : N2Index) {
+    pub fn swap_node(&mut self, to_swap: N2Index, swap_with: N2Index) {
         let index_to_swap = self.get_index_from_n2index(to_swap);
         self.v[index_to_swap] = swap_with;
     }
@@ -208,13 +231,13 @@ impl Triangle {
     }
 
     #[inline]
-    pub fn assert_order(&self, nodes : &Vec<Point2>) {
-        assert!(Self::is_ordered_correctly(self.a(nodes),self.b(nodes),self.c(nodes)));
+    pub fn assert_order(&self, nodes: &Vec<Point2>) {
+        assert!(Self::is_ordered_correctly(self.a(nodes), self.b(nodes), self.c(nodes)));
     }
 
     #[inline]
-    fn is_ordered_correctly(a : &Point2, b : &Point2, c : &Point2) -> bool {
-        on_which_side_point_lies(a,b,c) == PointLiesOnSide::Right
+    fn is_ordered_correctly(a: &Point2, b: &Point2, c: &Point2) -> bool {
+        on_which_side_point_lies(a, b, c) == PointLiesOnSide::Right
     }
 }
 
