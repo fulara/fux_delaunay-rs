@@ -1,11 +1,10 @@
 extern crate fux_delaunay;
 
-use fux_delaunay::io::abaqus_read::load_from_abaqus_format;
-
 #[cfg(test)]
 mod neighborhood_test {
     use fux_delaunay::io::abaqus_read::load_from_abaqus_format;
     use fux_delaunay::types::*;
+    use fux_delaunay::algorithms::element_locators::*;
 
     #[test]
     fn load_trivial_and_check_neighborhood() {
@@ -19,7 +18,8 @@ mod neighborhood_test {
 
             let center = e.create_center_point(triangulation.nodes());
 
-            //assert_eq!(T3Index(i), element_locators::find_element_containing_point(triangulation.elements(), triangulation.nodes(), &center));
+
+            assert_eq!(LocationResult::InElement(T3Index(i)), locate_element_containing(triangulation.elements(), triangulation.nodes(), &center));
         }
     }
 }

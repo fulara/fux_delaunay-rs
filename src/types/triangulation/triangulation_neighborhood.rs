@@ -35,9 +35,15 @@ impl TriangulationNeighborhood {
         None
     }
 
-    pub fn teach_triangles_of_neighborhood(&self, elements: &mut Vec<Triangle>) {
-        for n_smaller_index in 0..self.triangle_neighborhood.len() {
-            for &(n_larger_index, opt_t1, opt_t2) in &self.triangle_neighborhood[n_smaller_index] {
+    pub fn teach_triangles_of_neighborhood(elements: &mut Vec<Triangle>) {
+        let mut neighborhood = TriangulationNeighborhood::new();
+        for i in 0..elements.len() {
+            let e = &elements[i];
+            neighborhood.register_triangle(e, T3Index(i));
+        }
+
+        for n_smaller_index in 0..neighborhood.triangle_neighborhood.len() {
+            for &(n_larger_index, opt_t1, opt_t2) in &neighborhood.triangle_neighborhood[n_smaller_index] {
                 if let (Some(t1), Some(t2)) = (opt_t1, opt_t2) {
                     {
                         let el1: &mut Triangle = &mut elements[t1.0];
@@ -115,7 +121,7 @@ mod tests {
 
         let mut tr = vec![t0, t1];
 
-        neighborhood.teach_triangles_of_neighborhood(&mut tr);
+        TriangulationNeighborhood::teach_triangles_of_neighborhood(&mut tr);
 
         assert_eq!(Some(T3Index(1)),tr[0].get_neighbor_from_index(1));
         assert_eq!(None,tr[0].get_neighbor_from_index(0));
