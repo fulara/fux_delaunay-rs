@@ -1,15 +1,22 @@
 use types::Triangulation;
 
-use std::io::BufWriter;
-use std::io::Write;
+use std::io::{Write, BufWriter};
+use std::fs::File;
 
-pub fn write_to_abaqus_format<W: Write>(mut buf: BufWriter<W>, triangulation: &Triangulation) {
+fn write_to_abaqus_format_impl<W: Write>(mut buf: BufWriter<W>, triangulation: &Triangulation) {
     AbaqusWriter {
         writer: buf,
         triangulation: triangulation
     }.write();
-    //write_header(&mut buf);
 }
+
+pub fn write_to_abaqus_format(path_to_file : &str, triangulation : &Triangulation) {
+    let mut f = File::create(path_to_file).expect(&format!("write_to_abaqus_format failed while opening file: {}", path_to_file));
+
+    let buf = BufWriter::new(f);
+    write_to_abaqus_format_impl(buf, triangulation);
+}
+
 
 struct AbaqusWriter<'a, W: Write> {
     writer: BufWriter<W>,
@@ -96,7 +103,7 @@ mod tests {
         //let tr
         let mut s = String::new();
 
-        write_to_abaqus_format(BufWriter::new(unsafe { s.as_mut_vec() }), &triangulation);
+        write_to_abaqus_format_impl(BufWriter::new(unsafe { s.as_mut_vec() }), &triangulation);
 
         let expected_file = "*Part, name=PART-1
 *Node

@@ -2,7 +2,7 @@ use super::Triangulation;
 
 use types::*;
 
-pub fn insert_into_element(triangulation: &mut Triangulation, element_index: T3Index, new_node_index: N2Index) {
+pub fn insert_into_element(triangulation: &mut Triangulation, element_index: T3Index, new_node_index: N2Index) -> (T3Index,T3Index,T3Index) {
     //left and top will be created. original elements becomes right element.
     let index_of_left = T3Index(triangulation.elements().len());
     let index_of_top = T3Index(triangulation.elements().len() + 1);
@@ -20,6 +20,7 @@ pub fn insert_into_element(triangulation: &mut Triangulation, element_index: T3I
     let top_element = Triangle::new(triangulation.nodes(), original_elements_nodes[1], original_elements_nodes[2], new_node_index);
 
     assert_eq!(*left_element.nodes(), [original_elements_nodes[0], original_elements_nodes[1], new_node_index]);
+    println!(" before assert: or_0{:?} or_1{:?} or_2{:?}  new_node{:?}", triangulation.nodes()[original_elements_nodes[0].0], triangulation.nodes()[original_elements_nodes[1].0], triangulation.nodes()[original_elements_nodes[2].0], triangulation.nodes()[new_node_index.0] , );
     assert_eq!(*top_element.nodes(), [original_elements_nodes[1], original_elements_nodes[2], new_node_index]);
 
     update_neighborhood(triangulation, original_element_neighbors[0], original_elements_nodes[0], original_elements_nodes[1], index_of_left);
@@ -36,6 +37,8 @@ pub fn insert_into_element(triangulation: &mut Triangulation, element_index: T3I
     set_neighbors(original_element, [original_element_neighbors[2],Some(index_of_left),Some(index_of_top)]);
 
     original_element.update_nodes(original_elements_nodes[2], original_elements_nodes[0], new_node_index);
+
+    (index_of_right, index_of_top, index_of_left)
 }
 
 fn set_neighbors(element: &mut Triangle, n: [Option<T3Index>; 3]) {

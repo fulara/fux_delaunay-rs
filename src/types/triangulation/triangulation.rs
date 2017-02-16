@@ -3,6 +3,11 @@ use types::Triangle;
 use types::TriangulationNeighborhood;
 use types::N2Index;
 
+use algorithms::element_locators::*;
+use algorithms::lawson_flipping;
+
+use super::triangulation_insertion;
+
 pub struct Triangulation {
     nodes: Vec<Point2>,
     elements: Vec<Triangle>,
@@ -54,6 +59,44 @@ impl Triangulation {
 
         ::math::which_side_of_circumcircle(a, b, c, p) == ::math::CircleSide::Inside
     }
+
+    #[inline]
+    pub fn insert_node(&mut self, p: &Point2) {
+        let location_result = locate_element_containing(&self.elements, &self.nodes, p);
+
+        self.nodes.push(*p);
+        let new_node_index = N2Index(self.nodes.len() - 1);
+
+        match location_result {
+            LocationResult::InElement(ele_index) => {
+                let (t1_index, t2_index, t3_index) = triangulation_insertion::insert_into_element(self, ele_index, new_node_index);
+                lawson_flipping::propagating_flip(self, new_node_index, t1_index);
+                lawson_flipping::propagating_flip(self, new_node_index, t2_index);
+                lawson_flipping::propagating_flip(self, new_node_index, t3_index);
+            }
+            LocationResult::OnEdge(ele_index, edge_index) => {
+                let (neighbor_index, edge_node1, edge_node2)  = {
+                    let ele : &Triangle = &self.elements[ele_index.0];
+                    let neighbor_index = ele.get_neighbor_from_index(edge_index);
+                    let edge = ele.get_edge(edge_index);
+
+                    (neighbor_index, edge.0, edge.1)
+                };
+
+
+                if let Some(neighbor_index) = neighbor_index {
+                    triangulation_insertion::insert_into_element(self, ele_index, new_node_index);
+                    let neighbor_last_node = {
+                        let neighbor : &Triangle = &self.elements[neighbor_index.0];
+                        neighbor.get_other_last_node(edge_node1, edge_node2)
+                    };
+                    lawson_flipping::try_flip(self, neighbor_last_node, neighbor_index);
+                }  else {
+                    panic!("insert_node_on_edge not implemented for case when there is no neighbor");
+                }
+            }
+        }
+    }
 }
 
 #[cfg(test)]
@@ -69,7 +112,7 @@ mod tests {
         let triangulation: Triangulation = Triangulation::new(Point2::new(0., 1.), Point2::new(1., 1.), Point2::new(0., 0.), Point2::new(1., 0.));
 
         assert_eq!(2, triangulation.elements.len());
-        assert_eq!(Triangle::new_exact([N2Index(0),N2Index(3),N2Index(2)], [Some(T3Index(1)), None,None]), triangulation.elements()[0]);
-        assert_eq!(Triangle::new_exact([N2Index(0),N2Index(1),N2Index(3)], [None, None,Some(T3Index(0))]), triangulation.elements()[1]);
+        assert_eq!(Triangle::new_exact([N2Index(0), N2Index(3), N2Index(2)], [Some(T3Index(1)), None, None]), triangulation.elements()[0]);
+        assert_eq!(Triangle::new_exact([N2Index(0), N2Index(1), N2Index(3)], [None, None, Some(T3Index(0))]), triangulation.elements()[1]);
     }
 }

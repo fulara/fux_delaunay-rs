@@ -65,6 +65,13 @@ impl Triangle {
     }
 
     #[inline]
+    pub fn get_edge(&self, index : usize) -> (N2Index, N2Index) {
+        assert!(index < 3);
+
+        (self.get_index(index), self.get_index(index+1))
+    }
+
+    #[inline]
     pub fn update_nodes(&mut self, a: N2Index, b: N2Index, c: N2Index) {
         self.v[0] = a;
         self.v[1] = b;
@@ -237,7 +244,12 @@ impl Triangle {
 
     #[inline]
     fn is_ordered_correctly(a: &Point2, b: &Point2, c: &Point2) -> bool {
-        on_which_side_point_lies(a, b, c) == PointLiesOnSide::Right
+        let lies_on_side = on_which_side_point_lies(a, b, c);
+
+        //assert!(lies_on_side != PointLiesOnSide::OnLine);
+        println!("lies on side? {:?}", lies_on_side);
+
+        lies_on_side != PointLiesOnSide::Left
     }
 }
 

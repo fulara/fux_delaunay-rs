@@ -8,7 +8,7 @@ use math;
 #[derive(Debug, Eq, PartialEq)]
 pub enum LocationResult {
     InElement(T3Index),
-    OnEdge(T3Index),
+    OnEdge(T3Index, usize),
 }
 
 #[inline]
@@ -19,6 +19,8 @@ pub fn locate_element_containing(elements: &Vec<Triangle>, nodes: &Vec<Point2>, 
         let ele: &Triangle = &elements[ele_index.0];
 
         let mut current_edge = 0;
+        let mut on_edge_found: Option<usize> = None;
+
         loop {
             if current_edge == 3 {
                 break;
@@ -34,15 +36,20 @@ pub fn locate_element_containing(elements: &Vec<Triangle>, nodes: &Vec<Point2>, 
                     break;
                 }
                 math::PointLiesOnSide::OnLine => {
-                    return LocationResult::OnEdge(ele_index);
+                    on_edge_found = Some(current_edge);
                 },
                 math::PointLiesOnSide::Right => ()
             }
             current_edge += 1;
         }
 
-        if current_edge == 3 && ele.is_point_inside(&nodes, &p) {
-            return LocationResult::InElement(ele_index);
+        if current_edge == 3 {
+            if let Some(on_edge_found) = on_edge_found {
+                return LocationResult::OnEdge(ele_index, on_edge_found);
+            }
+            if ele.is_point_inside(&nodes, &p) {
+                return LocationResult::InElement(ele_index);
+            }
         }
     }
 }
@@ -73,6 +80,6 @@ mod tests {
         assert_eq! (LocationResult::InElement(T3Index(0)), locate_element_containing(triangulation.elements(), triangulation.nodes(), &center0));
         assert_eq!(LocationResult::InElement(T3Index(1)), locate_element_containing(triangulation.elements(), triangulation.nodes(), &center1));
 
-        assert_eq! (LocationResult::OnEdge(T3Index(0)), locate_element_containing(triangulation.elements(), triangulation.nodes(), &Point2::new(0.5, 0.)));
+        assert_eq! (LocationResult::OnEdge(T3Index(0), 2usize), locate_element_containing(triangulation.elements(), triangulation.nodes(), &Point2::new(0.5, 0.)));
     }
 }
