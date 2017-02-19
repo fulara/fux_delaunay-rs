@@ -19,7 +19,7 @@ mod neighborhood_test {
             let center = e.create_center_point(triangulation.nodes());
 
 
-            assert_eq!(LocationResult::InElement(T3Index(i)), locate_element_containing(triangulation.elements(), triangulation.nodes(), &center));
+            assert_eq!(LocationResult::InElement(T3Index(i)), locate_element_containing(T3Index(0), triangulation.elements(), triangulation.nodes(), &center));
         }
     }
 }

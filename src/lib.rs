@@ -1,5 +1,8 @@
 #![cfg_attr(test, feature(plugin))]
 #![cfg_attr(test, plugin(quickcheck_macros))]
+#![feature(libc)]
+
+extern crate libc;
 
 #[cfg(test)]
 extern crate quickcheck;
@@ -10,6 +13,8 @@ pub mod math;
 pub mod types;
 pub mod io;
 pub mod algorithms;
+pub mod c_api;
+
 
 #[cfg(test)]
 mod tests {

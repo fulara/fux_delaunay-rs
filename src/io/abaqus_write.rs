@@ -10,7 +10,7 @@ fn write_to_abaqus_format_impl<W: Write>(mut buf: BufWriter<W>, triangulation: &
     }.write();
 }
 
-pub fn write_to_abaqus_format(path_to_file : &str, triangulation : &Triangulation) {
+pub fn write_to_abaqus_format(path_to_file: &str, triangulation: &Triangulation) {
     let mut f = File::create(path_to_file).expect(&format!("write_to_abaqus_format failed while opening file: {}", path_to_file));
 
     let buf = BufWriter::new(f);
@@ -48,7 +48,8 @@ impl<'a, W: Write> AbaqusWriter<'a, W> {
         self.writer.write("*Element, type=CPE3\n".as_bytes());
         for i in 0..self.triangulation.elements().len() {
             let element = &self.triangulation.elements()[i];
-            self.writer.write(format!("{},\t{},\t{},\t{}\n", i + 1, element.index_a().0 + 1, element.index_b().0 + 1, element.index_c().0 + 1).as_bytes());
+            //abaqus uses ccw order instead of cw, writing nodes in order [cab] is required.
+            self.writer.write(format!("{},\t{},\t{},\t{}\n", i + 1, element.index_c().0 + 1, element.index_b().0 + 1, element.index_a().0 + 1).as_bytes());
         }
     }
 
@@ -112,8 +113,8 @@ mod tests {
 3,	1,	1
 4,	0,	1
 *Element, type=CPE3
-1,	1,	3,	2
-2,	1,	4,	3
+1,	2,	3,	1
+2,	3,	4,	1
 *Elset, elset=M_1
 1,2
 *Solid Section, elset=M_1, material=M_1

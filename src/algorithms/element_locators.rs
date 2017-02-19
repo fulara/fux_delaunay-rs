@@ -12,8 +12,8 @@ pub enum LocationResult {
 }
 
 #[inline]
-pub fn locate_element_containing(elements: &Vec<Triangle>, nodes: &Vec<Point2>, p: &Point2) -> LocationResult {
-    let mut ele_index = T3Index(0);
+pub fn locate_element_containing(start_lookup_at : T3Index, elements: &Vec<Triangle>, nodes: &Vec<Point2>, p: &Point2) -> LocationResult {
+    let mut ele_index = start_lookup_at;
 
     loop {
         let ele: &Triangle = &elements[ele_index.0];
@@ -77,9 +77,9 @@ mod tests {
         let center0 = t0.create_center_point(&pts);
         let center1 = t1.create_center_point(&pts);
 
-        assert_eq! (LocationResult::InElement(T3Index(0)), locate_element_containing(triangulation.elements(), triangulation.nodes(), &center0));
-        assert_eq!(LocationResult::InElement(T3Index(1)), locate_element_containing(triangulation.elements(), triangulation.nodes(), &center1));
+        assert_eq! (LocationResult::InElement(T3Index(0)), locate_element_containing(T3Index(0),triangulation.elements(), triangulation.nodes(), &center0));
+        assert_eq!(LocationResult::InElement(T3Index(1)), locate_element_containing(T3Index(0),triangulation.elements(), triangulation.nodes(), &center1));
 
-        assert_eq! (LocationResult::OnEdge(T3Index(0), 2usize), locate_element_containing(triangulation.elements(), triangulation.nodes(), &Point2::new(0.5, 0.)));
+        assert_eq! (LocationResult::OnEdge(T3Index(0), 2usize), locate_element_containing(T3Index(0),triangulation.elements(), triangulation.nodes(), &Point2::new(0.5, 0.)));
     }
 }
