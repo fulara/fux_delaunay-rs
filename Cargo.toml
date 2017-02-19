@@ -3,10 +3,20 @@ name = "fux_delaunay"
 version = "0.1.0"
 authors = ["fulara <ntszar@gmail.com>"]
 
+#[lib]
+#crate-type= ["dylib"]
+
 [dependencies]
 cgmath = "0.12.0"
+rustc-serialize = "0.3.22"
 
 [dev-dependencies]
 quickcheck = "0.4.1"
 quickcheck_macros = "0.4.1"
 rand = "0.3"
+
+[profile.release]
+opt-level = 3
+lto = true
+debug = true
+debug-assertions = true

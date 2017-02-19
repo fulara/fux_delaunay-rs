@@ -9,6 +9,8 @@ extern crate quickcheck;
 
 extern crate cgmath;
 
+extern crate rustc_serialize;
+
 pub mod math;
 pub mod types;
 pub mod io;

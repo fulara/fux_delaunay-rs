@@ -20,7 +20,7 @@ pub fn insert_into_element(triangulation: &mut Triangulation, element_index: T3I
     let top_element = Triangle::new(triangulation.nodes(), original_elements_nodes[1], original_elements_nodes[2], new_node_index);
 
     assert_eq!(*left_element.nodes(), [original_elements_nodes[0], original_elements_nodes[1], new_node_index]);
-    println!(" before assert: or_0{:?} or_1{:?} or_2{:?}  new_node{:?}", triangulation.nodes()[original_elements_nodes[0].0], triangulation.nodes()[original_elements_nodes[1].0], triangulation.nodes()[original_elements_nodes[2].0], triangulation.nodes()[new_node_index.0], );
+    //println!(" before assert: or_0{:?} or_1{:?} or_2{:?}  new_node{:?}", triangulation.nodes()[original_elements_nodes[0].0], triangulation.nodes()[original_elements_nodes[1].0], triangulation.nodes()[original_elements_nodes[2].0], triangulation.nodes()[new_node_index.0], );
     assert_eq!(*top_element.nodes(), [original_elements_nodes[1], original_elements_nodes[2], new_node_index]);
 
     update_neighborhood(triangulation, original_element_neighbors[0], original_elements_nodes[0], original_elements_nodes[1], index_of_left);
@@ -58,13 +58,12 @@ fn update_neighborhood(triangulation: &mut Triangulation, for_index: Option<T3In
 pub fn insert_in_edge(triangulation: &mut Triangulation, element_index: T3Index, inserted_node_index: N2Index, edge_index: usize) -> (T3Index, T3Index) {
     let new_element_index = T3Index(triangulation.elements().len());
     //assumption is that the node is inserted in the middle between first and second nodes.
-    let (first_node_index, second_node_index, third_node_index, first_neighbor_index, second_neighbor_index) = {
+    let (second_node_index, third_node_index,second_neighbor_index) = {
         let element: &Triangle = &triangulation.elements()[element_index.0];
         let first_second_nodes = element.get_edge(edge_index);
         let last_node = element.get_other_last_node(first_second_nodes.0, first_second_nodes.1);
-        let first_neighbor = element.get_neighor_for_nodes(first_second_nodes.0, last_node);
         let second_neighbor = element.get_neighor_for_nodes(first_second_nodes.1, last_node);
-        (first_second_nodes.0, first_second_nodes.1, last_node, first_neighbor, second_neighbor)
+        (first_second_nodes.1, last_node, second_neighbor)
     };
 
     let mut new_element = Triangle::new(triangulation.nodes(), inserted_node_index, third_node_index, second_node_index);

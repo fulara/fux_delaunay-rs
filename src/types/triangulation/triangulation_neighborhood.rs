@@ -99,7 +99,7 @@ mod tests {
 
     #[test]
     fn testing_neighborhood() {
-        let mut pts = vec![Point2::new(0.0, 0.0), Point2::new(1.0, 0.0), Point2::new(0.0, 1.0), Point2::new(1.0, 1.0)];
+        let pts = vec![Point2::new(0.0, 0.0), Point2::new(1.0, 0.0), Point2::new(0.0, 1.0), Point2::new(1.0, 1.0)];
 
         let t0 = Triangle::new(&pts, N2Index(0), N2Index(1), N2Index(2));
         let t1 = Triangle::new(&pts, N2Index(1), N2Index(2), N2Index(3));

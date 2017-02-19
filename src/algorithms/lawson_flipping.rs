@@ -1,5 +1,4 @@
 use ::types::*;
-use ::math::*;
 
 pub fn try_flip(triangulation: &mut Triangulation, bottom_node_index: N2Index, bottom_element_index: T3Index) -> Option<(T3Index, T3Index)> {
     let (common1, common2, top_element_index) =

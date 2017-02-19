@@ -10,13 +10,11 @@ pub fn load_from_abaqus_format(path_to_file: &str) -> Result<Triangulation, Stri
         Err(_) => return Err("failed to open file".to_owned())
     };
 
-    let mut fbuf = BufReader::new(f);
+    let fbuf = BufReader::new(f);
     read_buff(fbuf)
 }
 
-fn read_buff<R: Read>(mut reader: BufReader<R>) -> Result<Triangulation, String> {
-    let mut s = String::new();
-
+fn read_buff<R: Read>(reader: BufReader<R>) -> Result<Triangulation, String> {
     enum ParserState {
         BeforeNode,
         Nodes,
@@ -47,7 +45,6 @@ fn read_buff<R: Read>(mut reader: BufReader<R>) -> Result<Triangulation, String>
                             if split_line.len() != 3 {
                                 return Err(format!("line '{}' is not valid for a Node line", line))
                             } else {
-                                let node_index: u64 = split_line[0].trim().parse().unwrap();
                                 let x: f64 = split_line[1].trim().parse().unwrap();
                                 let y: f64 = split_line[2].trim().parse().unwrap();
 
@@ -65,7 +62,6 @@ fn read_buff<R: Read>(mut reader: BufReader<R>) -> Result<Triangulation, String>
                             if split_line.len() != 4 {
                                 return Err(format!("line '{}' is not valid for a elementLine line", line))
                             } else {
-                                let element_index: u64 = split_line[0].trim().parse().unwrap();
                                 let n1 = split_line[1].trim().parse::<usize>().unwrap() - 1usize;
                                 let n2 = split_line[2].trim().parse::<usize>().unwrap() - 1usize;
                                 let n3 = split_line[3].trim().parse::<usize>().unwrap() - 1usize;
@@ -111,7 +107,7 @@ mod test {
 *Element, type=CPE3
 1,	1,	2,	3
 ";
-        let mut reader = BufReader::new(s.as_bytes());
+        let reader = BufReader::new(s.as_bytes());
         match read_buff(reader) {
             Ok(tr) => {
                 assert_eq!(3, tr.nodes().len());

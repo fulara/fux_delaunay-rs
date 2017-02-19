@@ -22,6 +22,8 @@ pub fn locate_element_containing(start_lookup_at : T3Index, elements: &Vec<Trian
         let mut on_edge_found: Option<usize> = None;
 
         loop {
+            //println!("locating: curr index is: {:?} {:?}", ele_index, ele);
+            //println!("current_edge: {:?}", current_edge);
             if current_edge == 3 {
                 break;
             }
@@ -49,6 +51,7 @@ pub fn locate_element_containing(start_lookup_at : T3Index, elements: &Vec<Trian
             }
             if ele.is_point_inside(&nodes, &p) {
                 return LocationResult::InElement(ele_index);
+            } else {
             }
         }
     }
@@ -65,12 +68,12 @@ mod tests {
 
     #[test]
     fn locator_test() {
-        let mut pts = vec![Point2::new(0.0, 0.0), Point2::new(1.0, 0.0), Point2::new(0.0, 1.0), Point2::new(1.0, 1.0)];
+        let pts = vec![Point2::new(0.0, 0.0), Point2::new(1.0, 0.0), Point2::new(0.0, 1.0), Point2::new(1.0, 1.0)];
 
         let t0 = Triangle::new(&pts, N2Index(0), N2Index(1), N2Index(2));
         let t1 = Triangle::new(&pts, N2Index(1), N2Index(2), N2Index(3));
 
-        let mut triangles = vec![t0.clone(), t1.clone()];
+        let triangles = vec![t0.clone(), t1.clone()];
 
         let triangulation = Triangulation::new_from_prebuilt_triangulation(pts.clone(), triangles);
 

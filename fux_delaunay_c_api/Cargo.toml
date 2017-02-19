@@ -1,0 +1,14 @@
+[package]
+name = "fux_delaunay_c_api"
+version = "0.1.0"
+authors = ["Olek <ntszar@gmail.com>"]
+build = "build.rs"
+
+[lib]
+crate-type= ["dylib"]
+
+[dependencies]
+fux_delaunay = { path = "../" }
+
+[build-dependencies]
+gcc = "*"

@@ -78,10 +78,7 @@ mod tests {
     use ::types::N2Index;
 
     use cgmath::Rad;
-    use cgmath::Vector2;
-    use cgmath::{Matrix, Matrix2};
     use cgmath::{Rotation, Rotation2, Basis2};
-    use cgmath::ApproxEq;
     use std::f64;
 
     #[test]

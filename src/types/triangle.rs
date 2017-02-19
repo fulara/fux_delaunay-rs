@@ -65,10 +65,10 @@ impl Triangle {
     }
 
     #[inline]
-    pub fn get_edge(&self, index : usize) -> (N2Index, N2Index) {
+    pub fn get_edge(&self, index: usize) -> (N2Index, N2Index) {
         assert!(index < 3);
 
-        (self.get_index(index), self.get_index(index+1))
+        (self.get_index(index), self.get_index(index + 1))
     }
 
     #[inline]
@@ -105,7 +105,8 @@ impl Triangle {
         let u = (dot11 * dot02 - dot01 * dot12) * inv_denom;
         let v = (dot00 * dot12 - dot01 * dot02) * inv_denom;
 
-        (u >= 0.) && (v >= 0.) && (u + v <= 1.)
+        let eps = 1e-11; //Well. silly solution but okay.
+        (u + eps >= 0.) && (v + eps >= 0.) && (u + v <= 1. + eps)
     }
 
     #[inline]
@@ -245,9 +246,6 @@ impl Triangle {
     #[inline]
     fn is_ordered_correctly(a: &Point2, b: &Point2, c: &Point2) -> bool {
         let lies_on_side = on_which_side_point_lies(a, b, c);
-
-        //assert!(lies_on_side != PointLiesOnSide::OnLine);
-        println!("lies on side? {:?}", lies_on_side);
 
         lies_on_side != PointLiesOnSide::Left
     }
