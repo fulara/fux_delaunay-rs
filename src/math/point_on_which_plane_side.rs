@@ -39,9 +39,9 @@ pub fn on_which_plane_side_point_lies(a: &Point3, b: &Point3, c: &Point3, p: &Po
     let max_y  = max_val_y.max(min_val_y.abs());
     let max_z  = max_val_z.max(min_val_z.abs());
 
-
+    //is there a need to include the ab/ac/ap calculation in the eps? I dont think so since the magnitude is different. not sure.
     let eps = max_x * max_y * max_z * fp::EPSILON;
-    println!(" eps is: {} det is: {}", eps, det);
+
     if det < -eps {
         PointLiesOnPlaneSide::Left
     } else if det > eps {
@@ -83,7 +83,6 @@ mod tests {
 
         let center = Point3::new((a.x + b.x + c.x) / 3., (a.y + b.y + c.y) / 3., (a.z + b.z + c.z) / 3.);
 
-        println!("testing here.");
         assert_eq!(PointLiesOnPlaneSide::OnPlane, on_which_plane_side_point_lies(&a, &b, &c, &center));
         /*assert_eq!(PointLiesOnPlaneSide::OnPlane, on_which_plane_side_point_lies(&a, &b, &c, &Point3::new(0.5, -5000., 0.)));
         assert_eq!(PointLiesOnPlaneSide::OnPlane, on_which_plane_side_point_lies(&a, &b, &c, &Point3::new(500., -2000., 0.)));
