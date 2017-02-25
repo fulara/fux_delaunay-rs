@@ -245,9 +245,9 @@ impl Triangle {
 
     #[inline]
     fn is_ordered_correctly(a: &Point2, b: &Point2, c: &Point2) -> bool {
-        let lies_on_side = on_which_side_point_lies(a, b, c);
+        let lies_on_side = on_which_line_side_point_lies(a, b, c);
 
-        lies_on_side != PointLiesOnSide::Left
+        lies_on_side != PointLiesOnLineSide::Left
     }
 }
 
