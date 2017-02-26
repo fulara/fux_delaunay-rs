@@ -136,18 +136,8 @@ mod tests {
 
         let sides = [(a, b, c), (b, a, d), (d, c, b), (d, b, a)];
 
-        //println!("check 0");
         assert_eq!(SideOfPlane::Right, side_of_plane(&a, &b, &c, &d));
         let center = Point3::new((a.x + b.x + c.x + d.x) / 4., (a.y + b.y + c.y + d.y) / 4., (a.z + b.z + c.z + d.z) / 4.);
-        let center_1 = Point3::new((a.x + b.x + c.x) / 3., (a.y + b.y + c.y) / 3., (a.z + b.z + c.z) / 3.);
-        let center_2 = Point3::new((a.x + b.x + d.x) / 3., (a.y + b.y + d.y) / 3., (a.z + b.z + d.z) / 3.);
-        let center_3 = Point3::new((b.x + c.x + d.x) / 3., (b.y + c.y + d.y) / 3., (b.z + c.z + d.z) / 3.);
-        let center_4 = Point3::new((a.x + b.x + d.x) / 3., (a.y + b.y + d.y) / 3., (a.z + b.z + d.z) / 3.);
-
-        assert_eq!(SideOfPlane::Right, side_of_plane(&a, &b, &c, &center));
-        assert_eq!(SideOfPlane::Right, side_of_plane(&b, &a, &d, &center));
-        assert_eq!(SideOfPlane::Right, side_of_plane(&d, &c, &b, &center));
-        assert_eq!(SideOfPlane::Right, side_of_plane(&d, &b, &a, &center));
 
         for side in sides.iter() {
             let side_center = Point3::new((side.0.x + side.2.x + side.1.x)/3., (side.0.y + side.2.y + side.1.y)/3., (side.0.z + side.2.z + side.1.z)/3.);
@@ -156,6 +146,7 @@ mod tests {
 
             assert_eq!(SideOfPlane::OnPlane, side_of_plane(&side.0, &side.1, &side.2, &center));
             assert_eq!(SideOfPlane::Left, side_of_plane(&side.0, &side.1, &side.2, &on_the_other_side));
+            assert_eq!(SideOfPlane::Right, side_of_plane(&side.0, &side.1, &side.2, &center))
         }
     }
 }
