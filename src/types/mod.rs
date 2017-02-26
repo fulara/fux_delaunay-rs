@@ -7,6 +7,7 @@ mod t3_index;
 mod n2_index;
 
 mod point3;
+mod tetrahedron;
 
 pub use self::fp::Fp;
 
@@ -17,3 +18,4 @@ pub use self::t3_index::*;
 pub use self::triangulation::*;
 
 pub use self::point3::*;
+pub use self::tetrahedron::*;

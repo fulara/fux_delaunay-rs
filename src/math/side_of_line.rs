@@ -8,7 +8,7 @@ pub enum PointLiesOnLineSide {
 }
 
 #[inline]
-pub fn on_which_line_side_point_lies(line_begin: &Point2, line_end: &Point2, point: &Point2) -> PointLiesOnLineSide {
+pub fn side_of_line(line_begin: &Point2, line_end: &Point2, point: &Point2) -> PointLiesOnLineSide {
     let c0r0 = line_end.x - line_begin.x;
     let c0r1 = line_end.y - line_begin.y;
     let c1r0 = point.x - line_begin.x;
@@ -37,10 +37,10 @@ mod test {
         let c = Point2::new(0.5, 0.5);
         let d = Point2::new(1., 0.);
 
-        assert_eq!(PointLiesOnLineSide::OnLine, on_which_line_side_point_lies(&a, &b, &c));
-        assert_eq!(PointLiesOnLineSide::OnLine, on_which_line_side_point_lies(&b, &a, &c));
+        assert_eq!(PointLiesOnLineSide::OnLine, side_of_line(&a, &b, &c));
+        assert_eq!(PointLiesOnLineSide::OnLine, side_of_line(&b, &a, &c));
 
-        assert_eq!(PointLiesOnLineSide::Left, on_which_line_side_point_lies(&a, &d, &c));
-        assert_eq!(PointLiesOnLineSide::Right, on_which_line_side_point_lies(&d, &a, &c));
+        assert_eq!(PointLiesOnLineSide::Left, side_of_line(&a, &d, &c));
+        assert_eq!(PointLiesOnLineSide::Right, side_of_line(&d, &a, &c));
     }
 }

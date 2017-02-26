@@ -30,7 +30,7 @@ pub fn locate_element_containing(start_lookup_at : T3Index, elements: &Vec<Trian
 
             let edge = ele.edges_as_points_tuples(nodes)[current_edge];
 
-            match math::on_which_line_side_point_lies(edge.0, edge.1, p) {
+            match math::side_of_line(edge.0, edge.1, p) {
                 math::PointLiesOnLineSide::Left => {
                     assert!(ele.get_neighbor_from_index(current_edge).is_some());
 
