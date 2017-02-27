@@ -91,7 +91,7 @@ impl Triangulation {
         let b = tr.b(self.nodes());
         let c = tr.c(self.nodes());
 
-        ::math::which_side_of_circumcircle(a, b, c, p) == ::math::CircleSide::Inside
+        ::math::circumcircle_side(a, b, c, p) == ::math::CircleSide::Inside
     }
 
     #[inline]

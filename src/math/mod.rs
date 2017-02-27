@@ -1,5 +1,7 @@
 mod side_of_line;
+
 mod circumcircle_side;
+mod circumsphere_side;
 
 mod side_of_plane;
 mod order_float;

@@ -9,7 +9,7 @@ pub enum CircleSide {
     Outside,
 }
 
-pub fn which_side_of_circumcircle(p: &Point2, q: &Point2, r: &Point2, t: &Point2) -> CircleSide {
+pub fn circumcircle_side(p: &Point2, q: &Point2, r: &Point2, t: &Point2) -> CircleSide {
     //TODO the algorithm is taken from CGAL for now. rewrite.
     let qpx = q.x - p.x;
     let qpy = q.y - p.y;
@@ -87,13 +87,13 @@ mod tests {
         let p2 = Point2::new(2.1204, 9.5812);
         let p3 = Point2::new(5.0495, 7.5349);
 
-        assert_eq!(CircleSide::Outside, which_side_of_circumcircle(&p1, &p2, &p3, &Point2::new(20., 20.)));
-        assert_eq!(CircleSide::Outside, which_side_of_circumcircle(&p1, &p2, &p3, &Point2::new(5.2895, 6.7100)));
+        assert_eq!(CircleSide::Outside, circumcircle_side(&p1, &p2, &p3, &Point2::new(20., 20.)));
+        assert_eq!(CircleSide::Outside, circumcircle_side(&p1, &p2, &p3, &Point2::new(5.2895, 6.7100)));
 
-        assert_eq!(CircleSide::Inside, which_side_of_circumcircle(&p1, &p2, &p3, &Point2::new(5.2002, 6.6470)));
-        assert_eq!(CircleSide::Inside, which_side_of_circumcircle(&p1, &p2, &p3, &Point2::new(0.0582, 4.2369)));
+        assert_eq!(CircleSide::Inside, circumcircle_side(&p1, &p2, &p3, &Point2::new(5.2002, 6.6470)));
+        assert_eq!(CircleSide::Inside, circumcircle_side(&p1, &p2, &p3, &Point2::new(0.0582, 4.2369)));
 
-        assert_eq!(CircleSide::Outside, which_side_of_circumcircle(&p1, &p2, &p3, &Point2::new(-2.8154, -4.)));
+        assert_eq!(CircleSide::Outside, circumcircle_side(&p1, &p2, &p3, &Point2::new(-2.8154, -4.)));
     }
 
     #[test]
@@ -102,8 +102,8 @@ mod tests {
 
         let tr = Triangle::new(&nodes, N2Index(0), N2Index(1), N2Index(2));
 
-        assert_eq!(CircleSide::Inside, which_side_of_circumcircle(&tr.a(&nodes), &tr.b(&nodes), &tr.c(&nodes), &Point2::new(0.5, 0.5)));
-        assert_eq!(CircleSide::Outside, which_side_of_circumcircle(&tr.a(&nodes), &tr.b(&nodes), &tr.c(&nodes), &Point2::new(1.1, 1.1)));
+        assert_eq!(CircleSide::Inside, circumcircle_side(&tr.a(&nodes), &tr.b(&nodes), &tr.c(&nodes), &Point2::new(0.5, 0.5)));
+        assert_eq!(CircleSide::Outside, circumcircle_side(&tr.a(&nodes), &tr.b(&nodes), &tr.c(&nodes), &Point2::new(1.1, 1.1)));
     }
 
 
@@ -135,7 +135,7 @@ mod tests {
                 rotated_point = one_hundreth_pi_rotattion.rotate_point(rotated_point);
 
                 let tested_point = Point2::new(rotated_point.x + p.x, rotated_point.y + p.y);
-                let side = which_side_of_circumcircle(&p0, &p1, &p2, &tested_point);
+                let side = circumcircle_side(&p0, &p1, &p2, &tested_point);
 
                 if multiplier < 0.99 {
                     assert_eq!(CircleSide::Inside, side);
