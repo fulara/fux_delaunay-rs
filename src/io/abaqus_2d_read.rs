@@ -4,7 +4,7 @@ use std::io::BufReader;
 use std::fs::File;
 use std::io::Read;
 
-pub fn load_from_abaqus_format(path_to_file: &str) -> Result<Triangulation, String> {
+pub fn load_2d_from_abaqus_format(path_to_file: &str) -> Result<Triangulation2, String> {
     let f = match File::open(path_to_file) {
         Ok(file) => file,
         Err(_) => return Err("failed to open file".to_owned())
@@ -14,7 +14,7 @@ pub fn load_from_abaqus_format(path_to_file: &str) -> Result<Triangulation, Stri
     read_buff(fbuf)
 }
 
-fn read_buff<R: Read>(reader: BufReader<R>) -> Result<Triangulation, String> {
+fn read_buff<R: Read>(reader: BufReader<R>) -> Result<Triangulation2, String> {
     enum ParserState {
         BeforeNode,
         Nodes,
@@ -77,7 +77,7 @@ fn read_buff<R: Read>(reader: BufReader<R>) -> Result<Triangulation, String> {
     }
 
     match state {
-        ParserState::AfterElements | ParserState::Elements => Ok(Triangulation::new_from_prebuilt_triangulation(nodes, elements)),
+        ParserState::AfterElements | ParserState::Elements => Ok(Triangulation2::new_from_prebuilt_triangulation(nodes, elements)),
         _ => Err("failed to parse file".to_owned()),
     }
 }

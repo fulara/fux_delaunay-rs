@@ -2,7 +2,7 @@ extern crate fux_delaunay;
 extern crate rand;
 
 use fux_delaunay::types::*;
-use fux_delaunay::io::abaqus_write;
+use fux_delaunay::io::abaqus_2d_write;
 use rand::distributions::{IndependentSample, Range};
 use rand::{SeedableRng, StdRng};
 
@@ -12,7 +12,7 @@ fn trivial_tests_1() {
 
     triangulation.insert_node(&Point2::new(2., 2.));
 
-    abaqus_write::write_to_abaqus_format("tests/tests_results/trivial_tests_1.inp", &triangulation);
+    abaqus_2d_write::write_2d_to_abaqus_format("tests/tests_results/trivial_tests_1.inp", &triangulation);
 }
 
 #[test]
@@ -28,7 +28,7 @@ fn trivial_tests_2() {
     triangulation.insert_node(&Point2::new(8., 8.));
     triangulation.insert_node(&Point2::new(10., 8.));
 
-    abaqus_write::write_to_abaqus_format("tests/tests_results/trivial_tests_2.inp", &triangulation);
+    abaqus_2d_write::write_2d_to_abaqus_format("tests/tests_results/trivial_tests_2.inp", &triangulation);
 }
 
 #[test]
@@ -52,7 +52,7 @@ fn trivial_tests_3() {
     triangulation.insert_node(&Point2::new(5., 8.));
     triangulation.insert_node(&Point2::new(8., 8.));
 
-    abaqus_write::write_to_abaqus_format("tests/tests_results/trivial_tests_3.inp", &triangulation);
+    abaqus_2d_write::write_2d_to_abaqus_format("tests/tests_results/trivial_tests_3.inp", &triangulation);
 }
 
 
@@ -68,7 +68,7 @@ fn trivial_tests_4() {
         //}
     }
 
-    abaqus_write::write_to_abaqus_format("tests/tests_results/trivial_tests_4.inp", &triangulation);
+    abaqus_2d_write::write_2d_to_abaqus_format("tests/tests_results/trivial_tests_4.inp", &triangulation);
 }
 
 #[test]
@@ -85,5 +85,5 @@ fn trivial_tests_5() {
         triangulation.insert_node(&Point2::new(x, y));
     }
 
-    abaqus_write::write_to_abaqus_format("tests/tests_results/trivial_tests_5.inp", &triangulation);
+    abaqus_2d_write::write_2d_to_abaqus_format("tests/tests_results/trivial_tests_5.inp", &triangulation);
 }

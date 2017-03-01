@@ -1,6 +1,6 @@
 use ::types::*;
 
-pub fn try_flip(triangulation: &mut Triangulation, bottom_node_index: N2Index, bottom_element_index: T3Index) -> Option<(T3Index, T3Index)> {
+pub fn try_flip(triangulation: &mut Triangulation2, bottom_node_index: N2Index, bottom_element_index: T3Index) -> Option<(T3Index, T3Index)> {
     let (common1, common2, top_element_index) =
     {
         let tr: &Triangle = &triangulation.elements()[bottom_element_index.0];
@@ -39,14 +39,14 @@ pub fn try_flip(triangulation: &mut Triangulation, bottom_node_index: N2Index, b
     Some((top_element_index, bottom_element_index))
 }
 
-pub fn propagating_flip(triangulation: &mut Triangulation, bottom_node_index: N2Index, bottom_element_index: T3Index) {
+pub fn propagating_flip(triangulation: &mut Triangulation2, bottom_node_index: N2Index, bottom_element_index: T3Index) {
     if let Some((left_ele, right_ele)) = try_flip(triangulation, bottom_node_index, bottom_element_index) {
         propagating_flip(triangulation, bottom_node_index, left_ele);
         propagating_flip(triangulation, bottom_node_index, right_ele);
     }
 }
 
-fn perform_swap_update_connections(triangulation: &mut Triangulation, element_to_swap_index: T3Index,
+fn perform_swap_update_connections(triangulation: &mut Triangulation2, element_to_swap_index: T3Index,
                                    element_swapping_with: T3Index, changing_neighborhood_element_index: Option<T3Index>,
                                    common_node_being_swapped_out: N2Index, common_node: N2Index,
                                    last_element_node_index: N2Index, node_being_swapped_in: N2Index) {
@@ -78,7 +78,7 @@ mod tests {
         let points: Vec<Point2> = vec!(Point2::new(2.5, 5.), Point2::new(3.5, 6.5), Point2::new(2., 6.5), Point2::new(3.5, 5.5));
         let eles: Vec<Triangle> = vec!(Triangle::new(&points, N2Index(0), N2Index(1), N2Index(3)));
 
-        let mut triangulation = Triangulation::new_from_prebuilt_triangulation(points, eles);
+        let mut triangulation = Triangulation2::new_from_prebuilt_triangulation(points, eles);
         let x = try_flip(&mut triangulation, N2Index(3), T3Index(0));
 
         assert_eq!(None, x);
@@ -89,7 +89,7 @@ mod tests {
         let points: Vec<Point2> = vec!(Point2::new(2.5, 5.), Point2::new(3.5, 6.5), Point2::new(2., 6.5), Point2::new(4., 5.5));
         let eles: Vec<Triangle> = vec!(Triangle::new(&points, N2Index(0), N2Index(1), N2Index(3)));
 
-        let mut triangulation = Triangulation::new_from_prebuilt_triangulation(points, eles);
+        let mut triangulation = Triangulation2::new_from_prebuilt_triangulation(points, eles);
         let x = try_flip(&mut triangulation, N2Index(3), T3Index(0));
 
         assert_eq!(None, x);
@@ -114,7 +114,7 @@ mod tests {
                                        Triangle::new(&points, N2Index(3), N2Index(1), N2Index(7)),
         );
 
-        let mut triangulation = Triangulation::new_from_prebuilt_triangulation(points, eles);
+        let mut triangulation = Triangulation2::new_from_prebuilt_triangulation(points, eles);
 
         assert_eq!(Triangle::new_exact([N2Index(0), N2Index(2), N2Index(1)], [Some(T3Index(3)), Some(T3Index(2)), Some(T3Index(1))]), triangulation.elements()[0]);
         assert_eq!(Triangle::new_exact([N2Index(0), N2Index(1), N2Index(3)], [Some(T3Index(0)), Some(T3Index(5)), Some(T3Index(4))]), triangulation.elements()[1]);

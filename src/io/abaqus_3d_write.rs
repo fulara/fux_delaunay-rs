@@ -1,28 +1,29 @@
-use types::Triangulation;
+use types::Triangulation3;
 
 use std::io::{Write, BufWriter};
 use std::fs::File;
 
-fn write_to_abaqus_format_impl<W: Write>(buf: BufWriter<W>, triangulation: &Triangulation) {
+fn write_3d_to_abaqus_format_impl<W: Write>(buf: BufWriter<W>, triangulation: &Triangulation3) {
     AbaqusWriter {
         writer: buf,
         triangulation: triangulation
     }.write();
 }
 
-pub fn write_to_abaqus_format(path_to_file: &str, triangulation: &Triangulation) {
+pub fn write_3d_to_abaqus_format(path_to_file: &str, triangulation: &Triangulation3) {
     let f = File::create(path_to_file).expect(&format!("write_to_abaqus_format failed while opening file: {}", path_to_file));
 
     let buf = BufWriter::new(f);
-    write_to_abaqus_format_impl(buf, triangulation);
+    write_3d_to_abaqus_format_impl(buf, triangulation);
 }
 
 
 struct AbaqusWriter<'a, W: Write> {
     writer: BufWriter<W>,
-    triangulation: &'a Triangulation,
+    triangulation: &'a Triangulation3,
 }
 
+//todo: remove duplication from here for sure!
 impl<'a, W: Write> AbaqusWriter<'a, W> {
     fn write(mut self) {
         self.write_header();
@@ -40,16 +41,16 @@ impl<'a, W: Write> AbaqusWriter<'a, W> {
         let _ = self.writer.write("*Node\n".as_bytes());
         for i in 0..self.triangulation.nodes().len() {
             let node = &self.triangulation.nodes()[i];
-            let _ = self.writer.write(format!("{},\t{},\t{}\n", i + 1, node.x, node.y).as_bytes());
+            let _ = self.writer.write(format!("{},\t{},\t{},\t{}\n", i + 1, node.x, node.y, node.z).as_bytes());
         }
     }
 
     fn write_elements(&mut self) {
-        let _ = self.writer.write("*Element, type=CPE3\n".as_bytes());
+        let _ = self.writer.write("*Element, type=C3D4\n".as_bytes());
         for i in 0..self.triangulation.elements().len() {
             let element = &self.triangulation.elements()[i];
             //abaqus uses ccw order instead of cw, writing nodes in order [cab] is required.
-            let _ = self.writer.write(format!("{},\t{},\t{},\t{}\n", i + 1, element.index_c().0 + 1, element.index_b().0 + 1, element.index_a().0 + 1).as_bytes());
+            let _ = self.writer.write(format!("{},\t{},\t{},\t{},\t{}\n", i + 1, element.index_d().0 + 1,element.index_c().0 + 1, element.index_b().0 + 1, element.index_a().0 + 1).as_bytes());
         }
     }
 
@@ -98,23 +99,24 @@ mod tests {
 
     #[test]
     fn testing_bufwriter_and_string() {
-        let nodes = vec![Point2::new(0., 0.), Point2::new(1., 0.), Point2::new(1., 1.), Point2::new(0., 1.)];
-        let eles = vec![Triangle::new(&nodes, N2Index(0), N2Index(1), N2Index(2)), Triangle::new(&nodes, N2Index(0), N2Index(2), N2Index(3))];
-        let triangulation = Triangulation::new_from_prebuilt_triangulation(nodes, eles);
+        let nodes = vec![Point3::new(0., 0., 0.), Point3::new(100., 0.,0.), Point3::new(0., 100., 0.), Point3::new(0., 0., 100.), Point3::new(0., 0., -100.)];
+        let eles = vec![Tetrahedron::new(&nodes, N3Index(0), N3Index(1), N3Index(2), N3Index(3)), Tetrahedron::new(&nodes, N3Index(0), N3Index(1), N3Index(2), N3Index(4))];
+        let triangulation = Triangulation3::new_from_prebuilt_triangulation(nodes, eles);
         //let tr
         let mut s = String::new();
 
-        write_to_abaqus_format_impl(BufWriter::new(unsafe { s.as_mut_vec() }), &triangulation);
+        write_3d_to_abaqus_format_impl(BufWriter::new(unsafe { s.as_mut_vec() }), &triangulation);
 
         let expected_file = "*Part, name=PART-1
 *Node
-1,	0,	0
-2,	1,	0
-3,	1,	1
-4,	0,	1
-*Element, type=CPE3
-1,	2,	3,	1
-2,	3,	4,	1
+1,	0,	0,	0
+2,	100,	0,	0
+3,	0,	100,	0
+4,	0,	0,	100
+5,	0,	0,	-100
+*Element, type=C3D4
+1,	4,	3,	2,	1
+2,	5,	3,	2,	1
 *Elset, elset=M_1
 1,2
 *Solid Section, elset=M_1, material=M_1

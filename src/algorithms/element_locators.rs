@@ -63,7 +63,7 @@ mod tests {
     use types::Triangle;
     use types::N2Index;
     use types::T3Index;
-    use types::Triangulation;
+    use types::Triangulation2;
     use super::*;
 
     #[test]
@@ -75,7 +75,7 @@ mod tests {
 
         let triangles = vec![t0.clone(), t1.clone()];
 
-        let triangulation = Triangulation::new_from_prebuilt_triangulation(pts.clone(), triangles);
+        let triangulation = Triangulation2::new_from_prebuilt_triangulation(pts.clone(), triangles);
 
         let center0 = t0.create_center_point(&pts);
         let center1 = t1.create_center_point(&pts);

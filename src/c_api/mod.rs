@@ -60,7 +60,7 @@ pub fn generate_triangulation(points: *mut CApiPoint2, point_count: libc::int32_
         nodes.push(Point2::new(p.x, p.y));
     }
 
-    let triangulation = Triangulation::new(&nodes);
+    let triangulation = Triangulation2::new(&nodes);
 
     let mut elements: Vec<CApiElement3> = Vec::new();
 

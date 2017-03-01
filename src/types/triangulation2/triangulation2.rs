@@ -7,27 +7,27 @@ use types::T3Index;
 use algorithms::element_locators::*;
 use algorithms::lawson_flipping;
 
-use super::triangulation_insertion;
-use super::triangulation_utilities;
+use super::triangulation2_insertion;
+use super::triangulation2_utilities;
 
-pub struct Triangulation {
+pub struct Triangulation2 {
     nodes: Vec<Point2>,
     elements: Vec<Triangle>,
     last_added_element_index: T3Index,
 }
 
-impl Triangulation {
+impl Triangulation2 {
     #[inline]
-    pub fn new_from_prebuilt_triangulation(nodes: Vec<Point2>, elements: Vec<Triangle>) -> Triangulation {
-        let mut tr = Triangulation { nodes: nodes, elements: elements, last_added_element_index: T3Index(0) };
+    pub fn new_from_prebuilt_triangulation(nodes: Vec<Point2>, elements: Vec<Triangle>) -> Triangulation2 {
+        let mut tr = Triangulation2 { nodes: nodes, elements: elements, last_added_element_index: T3Index(0) };
 
         TriangulationNeighborhood::teach_triangles_of_neighborhood(&mut tr.elements);
         tr
     }
 
     #[inline]
-    pub fn new(nodes: &[Point2]) -> Triangulation {
-        let (top_left_index, top_right_index, bottom_left_index, bottom_right_index) = triangulation_utilities::find_corner_nodes(nodes);
+    pub fn new(nodes: &[Point2]) -> Triangulation2 {
+        let (top_left_index, top_right_index, bottom_left_index, bottom_right_index) = triangulation2_utilities::find_corner_nodes(nodes);
         let mut indexes_except_corner: Vec<usize> = Vec::new();
 
         for i in 0..nodes.len() {
@@ -57,7 +57,7 @@ impl Triangulation {
                             Triangle::new(&nodes, N2Index(top_left_index), N2Index(top_right_index), N2Index(bottom_right_index))];
 
         TriangulationNeighborhood::teach_triangles_of_neighborhood(&mut eles);
-        let mut triangulation = Triangulation {
+        let mut triangulation = Triangulation2 {
             elements: eles,
             last_added_element_index: T3Index(0),
             nodes: nodes,
@@ -109,7 +109,7 @@ impl Triangulation {
         match location_result {
             LocationResult::InElement(ele_index) => {
                 self.last_added_element_index = ele_index;
-                let (t1_index, t2_index, t3_index) = triangulation_insertion::insert_into_element(self, ele_index, new_node_index);
+                let (t1_index, t2_index, t3_index) = triangulation2_insertion::insert_into_element(self, ele_index, new_node_index);
                 lawson_flipping::propagating_flip(self, new_node_index, t1_index);
                 lawson_flipping::propagating_flip(self, new_node_index, t2_index);
                 lawson_flipping::propagating_flip(self, new_node_index, t3_index);
@@ -126,14 +126,14 @@ impl Triangulation {
 
 
                 if let Some(neighbor_index) = neighbor_index {
-                    triangulation_insertion::insert_into_element(self, ele_index, new_node_index);
+                    triangulation2_insertion::insert_into_element(self, ele_index, new_node_index);
                     let neighbor_last_node = {
                         let neighbor: &Triangle = &self.elements[neighbor_index.0];
                         neighbor.get_other_last_node(edge_node1, edge_node2)
                     };
                     lawson_flipping::try_flip(self, neighbor_last_node, neighbor_index);
                 } else {
-                    let (ele1, ele2) = triangulation_insertion::insert_in_edge(self, ele_index, new_node_index, edge_index);
+                    let (ele1, ele2) = triangulation2_insertion::insert_in_edge(self, ele_index, new_node_index, edge_index);
 
                     lawson_flipping::propagating_flip(self, new_node_index, ele1);
                     lawson_flipping::propagating_flip(self, new_node_index, ele2);
@@ -149,11 +149,11 @@ mod tests {
     use types::Triangle;
     use types::N2Index;
     use types::T3Index;
-    use super::Triangulation;
+    use super::Triangulation2;
 
     #[test]
     fn testing_bounding_box_creation() {
-        let triangulation: Triangulation = Triangulation::new(&[Point2::new(0., 1.), Point2::new(1., 1.), Point2::new(0., 0.), Point2::new(1., 0.)]);
+        let triangulation: Triangulation2 = Triangulation2::new(&[Point2::new(0., 1.), Point2::new(1., 1.), Point2::new(0., 0.), Point2::new(1., 0.)]);
 
         assert_eq!(2, triangulation.elements.len());
         assert_eq!(Triangle::new_exact([N2Index(0), N2Index(3), N2Index(2)], [Some(T3Index(1)), None, None]), triangulation.elements()[0]);

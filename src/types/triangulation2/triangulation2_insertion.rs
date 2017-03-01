@@ -1,8 +1,8 @@
-use super::Triangulation;
+use super::Triangulation2;
 
 use types::*;
 
-pub fn insert_into_element(triangulation: &mut Triangulation, element_index: T3Index, new_node_index: N2Index) -> (T3Index, T3Index, T3Index) {
+pub fn insert_into_element(triangulation: &mut Triangulation2, element_index: T3Index, new_node_index: N2Index) -> (T3Index, T3Index, T3Index) {
     //left and top will be created. original elements becomes right element.
     let index_of_left = T3Index(triangulation.elements().len());
     let index_of_top = T3Index(triangulation.elements().len() + 1);
@@ -47,7 +47,7 @@ fn set_neighbors(element: &mut Triangle, n: [Option<T3Index>; 3]) {
     }
 }
 
-fn update_neighborhood(triangulation: &mut Triangulation, for_index: Option<T3Index>, n1: N2Index, n2: N2Index, update_with: T3Index) {
+fn update_neighborhood(triangulation: &mut Triangulation2, for_index: Option<T3Index>, n1: N2Index, n2: N2Index, update_with: T3Index) {
     if let Some(updated_element_index) = for_index {
         let updated_element: &mut Triangle = &mut triangulation.elements_mut()[updated_element_index.0];
         updated_element.update_neighbor(n1, n2, Some(update_with));
@@ -55,7 +55,7 @@ fn update_neighborhood(triangulation: &mut Triangulation, for_index: Option<T3In
 }
 
 //this can only be invoked in cases when that element does not have neighbor on the edge.
-pub fn insert_in_edge(triangulation: &mut Triangulation, element_index: T3Index, inserted_node_index: N2Index, edge_index: usize) -> (T3Index, T3Index) {
+pub fn insert_in_edge(triangulation: &mut Triangulation2, element_index: T3Index, inserted_node_index: N2Index, edge_index: usize) -> (T3Index, T3Index) {
     let new_element_index = T3Index(triangulation.elements().len());
     //assumption is that the node is inserted in the middle between first and second nodes.
     let (second_node_index, third_node_index,second_neighbor_index) = {
@@ -105,7 +105,7 @@ mod tests {
                                        Triangle::new(&nodes, N2Index(2), N2Index(4), N2Index(1)),
                                        Triangle::new(&nodes, N2Index(5), N2Index(2), N2Index(0)));
 
-        let mut triangulation = Triangulation::new_from_prebuilt_triangulation(nodes, eles);
+        let mut triangulation = Triangulation2::new_from_prebuilt_triangulation(nodes, eles);
 
         insert_into_element(&mut triangulation, T3Index(0), N2Index(6));
 
@@ -130,7 +130,7 @@ mod tests {
                                        Triangle::new(&nodes, N2Index(1), N2Index(4), N2Index(2))
         );
 
-        let mut triangulation = Triangulation::new_from_prebuilt_triangulation(nodes, eles);
+        let mut triangulation = Triangulation2::new_from_prebuilt_triangulation(nodes, eles);
 
         assert_eq!(3, triangulation.elements().len());
         assert_eq!(Triangle::new_exact([N2Index(0), N2Index(1), N2Index(2)], [Some(T3Index(1)), Some(T3Index(2)), None]), triangulation.elements()[0]);
