@@ -87,25 +87,16 @@ mod tests {
 
         let tr = Tetrahedron::new(&points, N3Index(0), N3Index(1), N3Index(2), N3Index(3));
 
-        assert_eq!(*tr.a(&points), Point3::new(0., 0., 0.));
-        assert_eq!(*tr.b(&points), Point3::new(100., 0., 0.));
-        assert_eq!(*tr.c(&points), Point3::new(0., 100., 0.));
-        assert_eq!(*tr.d(&points), Point3::new(0., 0., 100.));
+        assert_eq!(*tr.a(&points), points[0]);
+        assert_eq!(*tr.b(&points), points[3]);
+        assert_eq!(*tr.c(&points), points[2]);
+        assert_eq!(*tr.d(&points), points[1]);
+
+        let correctly_ordered = Tetrahedron::new(&points, N3Index(0), N3Index(3), N3Index(2), N3Index(1));
+
+        assert_eq!(*correctly_ordered.a(&points), points[0]);
+        assert_eq!(*correctly_ordered.b(&points), points[3]);
+        assert_eq!(*correctly_ordered.c(&points), points[2]);
+        assert_eq!(*correctly_ordered.d(&points), points[1]);
     }
-    /*#[test]
-    fn abc_get_and_point_order_check() {
-        let points = vec![Point3::new(0., 0., 0.), Point2::new(0,2., 2.), Point2::new(1., 0.)];
-
-        let tr = Triangle::new(&points, N2Index(0), N2Index(1), N2Index(2));
-        let tr2 = Triangle::new(&points, N2Index(0), N2Index(2), N2Index(1));
-
-        assert_eq!(*tr.a(&points), Point2::new(0., 0.));
-        assert_eq!(*tr.b(&points), Point2::new(2., 2.));
-        assert_eq!(*tr.c(&points), Point2::new(1., 0.));
-
-        //triangle::new got different order, and yet the order is the same.
-        assert_eq!(*tr2.a(&points), Point2::new(0., 0.));
-        assert_eq!(*tr2.b(&points), Point2::new(2., 2.));
-        assert_eq!(*tr2.c(&points), Point2::new(1., 0.));
-    }*/
 }
