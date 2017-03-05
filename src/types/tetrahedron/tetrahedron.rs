@@ -14,7 +14,7 @@ pub struct Tetrahedron {
 
 impl Tetrahedron {
     #[inline]
-    pub fn new(points: &Vec<Point3>, a: N3Index, b: N3Index, c: N3Index, d: N3Index) -> Tetrahedron {
+    pub fn new(points: &[Point3], a: N3Index, b: N3Index, c: N3Index, d: N3Index) -> Tetrahedron {
         if is_ordered_correctly(&points[a.0], &points[b.0], &points[c.0], &points[d.0]) {
             Tetrahedron { v: [a, b, c, d], n: [None, None, None, None] }
         } else {
@@ -73,6 +73,36 @@ impl Tetrahedron {
     #[inline]
     pub fn nodes(&self) -> &[N3Index; 4] {
         &self.v
+    }
+
+    #[inline]
+    pub fn edges_as_indices_tuples(&self) -> [(N3Index, N3Index, N3Index); 4] {
+        [
+            (self.index_a(), self.index_b(), self.index_c()),
+            (self.index_b(), self.index_c(), self.index_d()),
+            (self.index_c(), self.index_d(), self.index_a()),
+            (self.index_d(), self.index_b(), self.index_a()),
+        ]
+    }
+
+    #[inline]
+    pub fn is_made_of(&self, nodes: [N3Index; 4]) -> bool {
+        for n3_index in nodes.iter() {
+            let mut found = false;
+
+            for i in 0..self.v.len() {
+                if self.v[i] == *n3_index {
+                    found = true;
+                    break
+                }
+            }
+
+            if found != true {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
 

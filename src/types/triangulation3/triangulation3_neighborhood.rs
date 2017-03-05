@@ -12,10 +12,9 @@ impl Triangulation3Neighborhood {
     }
 
     pub fn register_tetrahedron(&mut self, tetra: &Tetrahedron, tetra_index: T4Index) {
-        self.register_connection(tetra.index_a(), tetra.index_b(), tetra.index_c(), tetra_index);
-        self.register_connection(tetra.index_b(), tetra.index_c(), tetra.index_d(), tetra_index);
-        self.register_connection(tetra.index_c(), tetra.index_d(), tetra.index_a(), tetra_index);
-        self.register_connection(tetra.index_d(), tetra.index_b(), tetra.index_a(), tetra_index);
+        for edge_indices in tetra.edges_as_indices_tuples().iter() {
+            self.register_connection(edge_indices.0,edge_indices.1,edge_indices.2, tetra_index);
+        }
     }
 
     pub fn get_neighbor(&self, p1: N3Index, p2: N3Index, p3: N3Index, tetra_index: T4Index) -> Option<T4Index> {
@@ -44,14 +43,34 @@ impl Triangulation3Neighborhood {
         None
     }
 
-    /*pub fn teach_triangles_of_neighborhood(elements: &mut Vec<Triangle>) {
-        let mut neighborhood = TriangulationNeighborhood::new();
+    pub fn teach_triangles_of_neighborhood(elements: &mut [Tetrahedron]) {
+        let mut neighborhood = Triangulation3Neighborhood::new();
         for i in 0..elements.len() {
             let e = &elements[i];
-            neighborhood.register_triangle(e, T4Index(i));
+            neighborhood.register_tetrahedron(e, T4Index(i));
         }
 
         for n_smaller_index in 0..neighborhood.triangle_neighborhood.len() {
+            for &(n_medium_index, ref innest_vec) in neighborhood.triangle_neighborhood[n_smaller_index].iter() {
+                for &(n_largest_index, opt_t1, opt_t2) in innest_vec.iter() {
+                    if let (Some(t1), Some(t2)) = (opt_t1, opt_t2) {
+                        {
+                            let el1: &mut Tetrahedron = &mut elements[t1.0];
+                            //let neighbor_index = el1.get_neighbor_index(N3Index(n_smaller_index), n_larger_index);
+
+                            //el1.set_neighbor(neighbor_index, Some(t2));
+                        }
+                        {
+                            let el2: &mut Tetrahedron = &mut elements[t2.0];
+                            //let neighbor_index = el2.get_neighbor_index(N3Index(n_smaller_index), n_larger_index);
+
+                           // el2.set_neighbor(neighbor_index, Some(t1));
+                        }
+                    }
+                }
+            }
+        }
+        /*for n_smaller_index in 0..neighborhood.triangle_neighborhood.len() {
             for &(n_larger_index, opt_t1, opt_t2) in &neighborhood.triangle_neighborhood[n_smaller_index] {
                 if let (Some(t1), Some(t2)) = (opt_t1, opt_t2) {
                     {
@@ -68,8 +87,8 @@ impl Triangulation3Neighborhood {
                     }
                 }
             }
-        }
-    } */
+        } */
+    }
 
     fn register_connection(&mut self, p1: N3Index, p2: N3Index, p3: N3Index, tetra_index: T4Index) {
         let (smaller, medium, larger) = Self::smaller_larger(p1, p2, p3);
@@ -129,6 +148,9 @@ mod tests {
     use types::T4Index;
     use super::*;
 
+    use types::triangulation3_test_utils::get_example_initial_point_set;
+    use types::triangulation3::triangulation3_initiation::create_initial_tetra_set;
+
     #[quickcheck]
     fn smaller_larger_test(a: usize, b: usize, c: usize) {
         let mut v = vec!(a, b, c);
@@ -175,5 +197,15 @@ mod tests {
         assert_eq!(None, tr[1].get_neighbor_from_index(1));
         assert_eq!(Some(T4Index(0)), tr[1].get_neighbor_from_index(0));
         assert_eq!(None, tr[1].get_neighbor_from_index(2));*/
+    }
+
+    #[test]
+    fn testing_neighborhood_with_initiation() {
+        let nodes = get_example_initial_point_set();
+        let eles = create_initial_tetra_set(&nodes);
+
+        let mut neighborhood = Triangulation3Neighborhood::new();
+
+        //todo finish this.
     }
 }

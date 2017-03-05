@@ -85,7 +85,11 @@ impl Triangle {
 
     #[inline]
     pub fn edges_as_points_tuples<'a>(&self, points: &'a Vec<Point2>) -> [(&'a Point2, &'a Point2); 3] {
-        [(self.a(points), self.b(points)), (self.b(points), self.c(points)), (self.c(points), self.a(points))]
+        [
+            (self.a(points), self.b(points)),
+            (self.b(points), self.c(points)),
+            (self.c(points), self.a(points))
+        ]
     }
 
     #[inline]
