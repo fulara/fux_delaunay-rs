@@ -8,7 +8,7 @@ use rand::{SeedableRng, StdRng};
 
 #[test]
 fn trivial_tests_1() {
-    let mut triangulation = Triangulation::new(&[Point2::new(0., 10.), Point2::new(10., 10.), Point2::new(0., 0.), Point2::new(10., 0.)]);
+    let mut triangulation = Triangulation2::new(&[Point2::new(0., 10.), Point2::new(10., 10.), Point2::new(0., 0.), Point2::new(10., 0.)]);
 
     triangulation.insert_node(&Point2::new(2., 2.));
 
@@ -17,7 +17,7 @@ fn trivial_tests_1() {
 
 #[test]
 fn trivial_tests_2() {
-    let mut triangulation = Triangulation::new(&[Point2::new(0., 10.), Point2::new(10., 10.), Point2::new(0., 0.), Point2::new(10., 0.)]);
+    let mut triangulation = Triangulation2::new(&[Point2::new(0., 10.), Point2::new(10., 10.), Point2::new(0., 0.), Point2::new(10., 0.)]);
 
     triangulation.insert_node(&Point2::new(0., 2.));
     triangulation.insert_node(&Point2::new(2., 2.));
@@ -33,7 +33,7 @@ fn trivial_tests_2() {
 
 #[test]
 fn trivial_tests_3() {
-    let mut triangulation = Triangulation::new(&[Point2::new(0., 10.), Point2::new(10., 10.), Point2::new(0., 0.), Point2::new(10., 0.)]);
+    let mut triangulation = Triangulation2::new(&[Point2::new(0., 10.), Point2::new(10., 10.), Point2::new(0., 0.), Point2::new(10., 0.)]);
 
     triangulation.insert_node(&Point2::new(4., 4.));
     triangulation.insert_node(&Point2::new(6., 4.));
@@ -58,7 +58,7 @@ fn trivial_tests_3() {
 
 #[test]
 fn trivial_tests_4() {
-    let mut triangulation = Triangulation::new(&[Point2::new(0., 10.), Point2::new(10., 10.), Point2::new(0., 0.), Point2::new(10., 0.)]);
+    let mut triangulation = Triangulation2::new(&[Point2::new(0., 10.), Point2::new(10., 10.), Point2::new(0., 0.), Point2::new(10., 0.)]);
 
     for x in 1..2500 {
         //for y in 1 .. 100 {
@@ -73,7 +73,7 @@ fn trivial_tests_4() {
 
 #[test]
 fn trivial_tests_5() {
-    let mut triangulation = Triangulation::new(&[Point2::new(0., 10.), Point2::new(10., 10.), Point2::new(0., 0.), Point2::new(10., 0.)]);
+    let mut triangulation = Triangulation2::new(&[Point2::new(0., 10.), Point2::new(10., 10.), Point2::new(0., 0.), Point2::new(10., 0.)]);
 
     let seed: &[_] = &[1];
     let mut rng: StdRng = SeedableRng::from_seed(seed);

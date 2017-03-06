@@ -3,9 +3,12 @@ use cgmath::InnerSpace;
 use types::Point3;
 use types::N3Index;
 use types::T4Index;
+
+use algorithms3::sort_3::sort_3;
+
 use super::tetrahedron_order::is_ordered_correctly;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct Tetrahedron {
     v: [N3Index; 4],
 
@@ -31,22 +34,22 @@ impl Tetrahedron {
     }
 
     #[inline]
-    pub fn a<'a>(&self, points: &'a Vec<Point3>) -> &'a Point3 {
+    pub fn a<'a>(&self, points: &'a [Point3]) -> &'a Point3 {
         &points[self.v[0].0]
     }
 
     #[inline]
-    pub fn b<'a>(&self, points: &'a Vec<Point3>) -> &'a Point3 {
+    pub fn b<'a>(&self, points: &'a [Point3]) -> &'a Point3 {
         &points[self.v[1].0]
     }
 
     #[inline]
-    pub fn c<'a>(&self, points: &'a Vec<Point3>) -> &'a Point3 {
+    pub fn c<'a>(&self, points: &'a [Point3]) -> &'a Point3 {
         &points[self.v[2].0]
     }
 
     #[inline]
-    pub fn d<'a>(&self, points: &'a Vec<Point3>) -> &'a Point3 {
+    pub fn d<'a>(&self, points: &'a [Point3]) -> &'a Point3 {
         &points[self.v[3].0]
     }
 
@@ -86,6 +89,16 @@ impl Tetrahedron {
     }
 
     #[inline]
+    pub fn edges_as_points_tuples<'a>(&self, points: &'a [Point3]) -> [(&'a Point3, &'a Point3, &'a Point3); 4] {
+        [
+            (self.a(points), self.b(points), self.c(points)),
+            (self.b(points), self.c(points), self.d(points)),
+            (self.c(points), self.d(points), self.a(points)),
+            (self.d(points), self.b(points), self.b(points))
+        ]
+    }
+
+    #[inline]
     pub fn is_made_of(&self, nodes: [N3Index; 4]) -> bool {
         for n3_index in nodes.iter() {
             let mut found = false;
@@ -103,6 +116,47 @@ impl Tetrahedron {
         }
 
         return true;
+    }
+
+    #[inline]
+    pub fn get_neighbor_index(&self, n1: N3Index, n2: N3Index, n3: N3Index) -> usize {
+        //TODO this could all be eliminated if the elements and neighboring were ordered correctly,
+
+        let sorted_input = sort_3(n1, n2, n3);
+        for edge_index in 0..self.edges_as_indices_tuples().len() {
+            let edge = self.edges_as_indices_tuples()[edge_index];
+            let sorted_edge = sort_3(edge.0, edge.1, edge.2);
+
+            if sorted_edge.0 == sorted_input.0 && sorted_edge.1 == sorted_input.1 && sorted_edge.2 == sorted_input.2 {
+                return edge_index;
+            }
+        }
+        panic!("get_neighbor_index invoked with indices not belonging to this element. n1: '{:?}' n2: '{:?}' n3: '{:?}'", n1, n2, n3);
+    }
+
+    #[inline]
+    pub fn get_neighbor_for_indices(&self, n1: N3Index, n2: N3Index, n3: N3Index) -> Option<T4Index> {
+        self.n[self.get_neighbor_index(n1, n2, n3)]
+    }
+
+    #[inline]
+    pub fn get_neighbor_from_index(&self, index: usize) -> Option<T4Index> {
+        self.n[index]
+    }
+
+    #[inline]
+    pub fn set_neighbor(&mut self, index: usize, neighbor: Option<T4Index>) {
+        self.n[index] = neighbor;
+    }
+
+    #[inline]
+    pub fn create_center_point(&self, nodes: &[Point3]) -> Point3 {
+        let a = self.a(nodes);
+        let b = self.b(nodes);
+        let c = self.c(nodes);
+        let d = self.d(nodes);
+
+        Point3::new((a.x + b.x + c.x + d.x) / 4., (a.y + b.y + c.y + d.y) / 4., (a.z + b.z + c.z + d.z) / 4.)
     }
 }
 
@@ -128,5 +182,19 @@ mod tests {
         assert_eq!(*correctly_ordered.b(&points), points[3]);
         assert_eq!(*correctly_ordered.c(&points), points[2]);
         assert_eq!(*correctly_ordered.d(&points), points[1]);
+    }
+
+    #[test]
+    fn get_neighbor_index_test() {
+        let points = vec![Point3::new(0., 0., 0.), Point3::new(100., 0., 0.), Point3::new(0., 100., 0.), Point3::new(0., 0., 100.)];
+
+        let tr = Tetrahedron::new(&points, N3Index(0), N3Index(1), N3Index(2), N3Index(3));
+
+        assert_eq!(0, tr.get_neighbor_index(N3Index(0), N3Index(3), N3Index(2)));
+        assert_eq!(0, tr.get_neighbor_index(N3Index(0), N3Index(2), N3Index(3)));
+        assert_eq!(0, tr.get_neighbor_index(N3Index(3), N3Index(0), N3Index(2)));
+        assert_eq!(0, tr.get_neighbor_index(N3Index(3), N3Index(2), N3Index(0)));
+        assert_eq!(0, tr.get_neighbor_index(N3Index(2), N3Index(0), N3Index(3)));
+        assert_eq!(0, tr.get_neighbor_index(N3Index(2), N3Index(3), N3Index(0)));
     }
 }

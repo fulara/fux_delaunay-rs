@@ -4,8 +4,8 @@ use types::TriangulationNeighborhood;
 use types::N2Index;
 use types::T3Index;
 
-use algorithms::element_locators::*;
-use algorithms::lawson_flipping;
+use algorithms2::element_locators::*;
+use algorithms2::lawson_flipping;
 
 use super::triangulation2_insertion;
 use super::triangulation2_utilities;

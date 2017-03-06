@@ -4,7 +4,7 @@ extern crate fux_delaunay;
 mod neighborhood_test {
     use fux_delaunay::io::abaqus_2d_read::load_2d_from_abaqus_format;
     use fux_delaunay::types::*;
-    use fux_delaunay::algorithms::element_locators::*;
+    use fux_delaunay::algorithms2::element_locators::*;
 
     #[test]
     fn load_trivial_and_check_neighborhood() {

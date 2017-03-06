@@ -14,7 +14,8 @@ extern crate rustc_serialize;
 pub mod math;
 pub mod types;
 pub mod io;
-pub mod algorithms;
+pub mod algorithms2;
+pub mod algorithms3;
 pub mod c_api;
 
 

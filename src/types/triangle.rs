@@ -4,7 +4,7 @@ use types::Point2;
 use types::n2_index::N2Index;
 use types::t3_index::T3Index;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct Triangle {
     v: [N2Index; 3],
 
@@ -13,7 +13,7 @@ pub struct Triangle {
 
 impl Triangle {
     #[inline]
-    pub fn new(points: &Vec<Point2>, a: N2Index, b: N2Index, c: N2Index) -> Triangle {
+    pub fn new(points: &[Point2], a: N2Index, b: N2Index, c: N2Index) -> Triangle {
         if Self::is_ordered_correctly(&points[a.0], &points[b.0], &points[c.0]) {
             Triangle { v: [a, b, c], n: [None, None, None] }
         } else {
@@ -30,17 +30,17 @@ impl Triangle {
     }
 
     #[inline]
-    pub fn a<'a>(&self, points: &'a Vec<Point2>) -> &'a Point2 {
+    pub fn a<'a>(&self, points: &'a [Point2]) -> &'a Point2 {
         &points[self.v[0].0]
     }
 
     #[inline]
-    pub fn b<'a>(&self, points: &'a Vec<Point2>) -> &'a Point2 {
+    pub fn b<'a>(&self, points: &'a [Point2]) -> &'a Point2 {
         &points[self.v[1].0]
     }
 
     #[inline]
-    pub fn c<'a>(&self, points: &'a Vec<Point2>) -> &'a Point2 {
+    pub fn c<'a>(&self, points: &'a [Point2]) -> &'a Point2 {
         &points[self.v[2].0]
     }
 
@@ -84,7 +84,7 @@ impl Triangle {
     }
 
     #[inline]
-    pub fn edges_as_points_tuples<'a>(&self, points: &'a Vec<Point2>) -> [(&'a Point2, &'a Point2); 3] {
+    pub fn edges_as_points_tuples<'a>(&self, points: &'a [Point2]) -> [(&'a Point2, &'a Point2); 3] {
         [
             (self.a(points), self.b(points)),
             (self.b(points), self.c(points)),
@@ -93,7 +93,7 @@ impl Triangle {
     }
 
     #[inline]
-    pub fn is_point_inside(&self, points: &Vec<Point2>, p: &Point2) -> bool
+    pub fn is_point_inside(&self, points: &[Point2], p: &Point2) -> bool
     {
         let v0 = self.c(points) - self.a(points);
         let v1 = self.b(points) - self.a(points);
@@ -207,17 +207,12 @@ impl Triangle {
     }
 
     #[inline]
-    pub fn create_center_point(&self, points: &Vec<Point2>) -> Point2 {
+    pub fn create_center_point(&self, points: &[Point2]) -> Point2 {
         let a = self.a(points);
         let b = self.b(points);
         let c = self.c(points);
 
         Point2::new((a.x + b.x + c.x) / 3., (a.y + b.y + c.y) / 3.)
-    }
-
-    #[inline]
-    pub fn clone(&self) -> Triangle {
-        Triangle { v: self.v, n: self.n }
     }
 
     #[inline]
@@ -243,7 +238,7 @@ impl Triangle {
     }
 
     #[inline]
-    pub fn assert_order(&self, nodes: &Vec<Point2>) {
+    pub fn assert_order(&self, nodes: &[Point2]) {
         assert!(Self::is_ordered_correctly(self.a(nodes), self.b(nodes), self.c(nodes)));
     }
 

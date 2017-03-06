@@ -16,5 +16,5 @@ fn test_300x300_truktura_500_json() {
         nodes.push(Point2::new(p.x, p.y));
     }
 
-    let _ = Triangulation::new(&nodes);
+    let _ = Triangulation2::new(&nodes);
 }
