@@ -82,8 +82,8 @@ impl Tetrahedron {
     pub fn edges_as_indices_tuples(&self) -> [(N3Index, N3Index, N3Index); 4] {
         [
             (self.index_a(), self.index_b(), self.index_c()),
-            (self.index_b(), self.index_c(), self.index_d()),
-            (self.index_c(), self.index_d(), self.index_a()),
+            (self.index_b(), self.index_a(), self.index_d()),
+            (self.index_d(), self.index_c(), self.index_b()),
             (self.index_d(), self.index_b(), self.index_a()),
         ]
     }
@@ -92,9 +92,9 @@ impl Tetrahedron {
     pub fn edges_as_points_tuples<'a>(&self, points: &'a [Point3]) -> [(&'a Point3, &'a Point3, &'a Point3); 4] {
         [
             (self.a(points), self.b(points), self.c(points)),
-            (self.b(points), self.c(points), self.d(points)),
-            (self.c(points), self.d(points), self.a(points)),
-            (self.d(points), self.b(points), self.b(points))
+            (self.b(points), self.a(points), self.d(points)),
+            (self.d(points), self.c(points), self.b(points)),
+            (self.d(points), self.b(points), self.a(points))
         ]
     }
 

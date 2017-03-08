@@ -1,6 +1,7 @@
 #![cfg_attr(test, feature(plugin))]
 #![cfg_attr(test, plugin(quickcheck_macros))]
 #![feature(libc)]
+//#![feature(i128_type)]
 
 extern crate libc;
 

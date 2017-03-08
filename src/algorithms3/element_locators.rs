@@ -14,7 +14,7 @@ pub enum LocationResult {
 
 
 #[inline]
-pub fn locate_element_containing(start_lookup_at : T4Index, elements: &[Tetrahedron], nodes: &[Point3], p: &Point3) -> LocationResult {
+pub fn locate_element_containing(start_lookup_at: T4Index, elements: &[Tetrahedron], nodes: &[Point3], p: &Point3) -> LocationResult {
     let mut ele_index = start_lookup_at;
 
     loop {
@@ -30,6 +30,7 @@ pub fn locate_element_containing(start_lookup_at : T4Index, elements: &[Tetrahed
 
             let edge = ele.edges_as_points_tuples(nodes)[current_face];
 
+            println!("matching no {:?} face. point is: {:?} result is {:?} edges: {:?} {:?} {:?}", current_face, p, math::side_of_plane(edge.0, edge.1, edge.2, p), edge.0, edge.1, edge.2);
             match math::side_of_plane(edge.0, edge.1, edge.2, p) {
                 math::SideOfPlane::Left => {
                     assert!(ele.get_neighbor_from_index(current_face).is_some());
@@ -45,7 +46,7 @@ pub fn locate_element_containing(start_lookup_at : T4Index, elements: &[Tetrahed
             current_face += 1;
         }
 
-        if current_face == 3 {
+        if current_face == 4 {
             if let Some(on_edge_found) = on_face_found {
                 return LocationResult::OnFace(ele_index, on_edge_found);
             }
@@ -69,7 +70,23 @@ mod tests {
     use super::*;
 
     #[test]
-    fn locator_test() {
+    fn locator_single_element() {
+        let pts = vec![Point3::new(0.0, 0.0, 0.0),
+                       Point3::new(1.0, 0.0, 0.0),
+                       Point3::new(0.0, 1.0, 0.0),
+                       Point3::new(0.0, 0.0, 1.0)];
+
+        let t0 = Tetrahedron::new(&pts, N3Index(0), N3Index(1), N3Index(2), N3Index(3));
+        let eles = vec![t0.clone()];
+
+        println!("t0 is {:?}", t0);
+        let point_inside = t0.create_center_point(&pts);// Point3::new(0.1, 0.1, 0.1);
+
+        assert_eq!(LocationResult::InElement(T4Index(0)), locate_element_containing(T4Index(0), &eles, &pts, &point_inside));
+    }
+
+    #[test]
+    fn finding_element_test() {
         let pts = vec![Point3::new(0.0, 0.0, 0.0),
                        Point3::new(1.0, 0.0, 0.0),
                        Point3::new(0.0, 1.0, 0.0),
@@ -86,11 +103,11 @@ mod tests {
         let center0 = t0.create_center_point(&pts);
         let center1 = t1.create_center_point(&pts);
 
-        assert_eq! (LocationResult::InElement(T4Index(0)), locate_element_containing(T4Index(0),triangulation.elements(), triangulation.nodes(), &center0));
-        assert_eq!(LocationResult::InElement(T4Index(1)), locate_element_containing(T4Index(0),triangulation.elements(), triangulation.nodes(), &center1));
+        assert_eq! (LocationResult::InElement(T4Index(0)), locate_element_containing(T4Index(0), triangulation.elements(), triangulation.nodes(), &center0));
+        assert_eq!(LocationResult::InElement(T4Index(1)), locate_element_containing(T4Index(0), triangulation.elements(), triangulation.nodes(), &center1));
 
-        assert_eq! (LocationResult::InElement(T4Index(0)), locate_element_containing(T4Index(1),triangulation.elements(), triangulation.nodes(), &center0));
-        assert_eq!(LocationResult::InElement(T4Index(1)), locate_element_containing(T4Index(1),triangulation.elements(), triangulation.nodes(), &center1));
+        assert_eq! (LocationResult::InElement(T4Index(0)), locate_element_containing(T4Index(1), triangulation.elements(), triangulation.nodes(), &center0));
+        assert_eq!(LocationResult::InElement(T4Index(1)), locate_element_containing(T4Index(1), triangulation.elements(), triangulation.nodes(), &center1));
 
         //todo finish testing this.
 

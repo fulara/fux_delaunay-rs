@@ -13,6 +13,7 @@ pub enum SideOfPlane {
 
 #[inline]
 pub fn side_of_plane(a: &Point3, b: &Point3, c: &Point3, p: &Point3) -> SideOfPlane {
+    //let x = 1i128;
     let ab = b - a;
     let ac = c - a;
     let ap = p - a;
@@ -40,7 +41,10 @@ pub fn side_of_plane(a: &Point3, b: &Point3, c: &Point3, p: &Point3) -> SideOfPl
     let max_z = max_val_z.max(min_val_z.abs());
 
     //is there a need to include the ab/ac/ap calculation in the eps? I dont think so since the magnitude is different. not sure.
+    let eps = max_x * max_y * max_z * max_x * max_y * max_z * fp::EPSILON;
     let eps = max_x * max_y * max_z * fp::EPSILON;
+
+    //println!("det is: {:?} a {:?} b {:?} c {:?} p {:?} eps is: {:?}", det, a,b,c,p, eps);
 
     if det < -eps {
         SideOfPlane::Right
@@ -116,9 +120,26 @@ mod tests {
         assert_eq!(SideOfPlane::Right, side_of_plane(&d, &b, &a, &center));
     }
 
+    #[test]
+    fn testing_center_should_be_on_the_same_side_2() {
+        let a = Point3::new(0.0, 0.0, 0.0);
+        let b = Point3::new(0.0, 0.0, 1.0);
+        let c = Point3::new(0.0, 1.0, 0.0);
+        let d = Point3::new(1.0, 0.0, 0.0);
+
+        let center = Point3::new((a.x + b.x + c.x + d.x) / 4., (a.y + b.y + c.y + d.y) / 4., (a.z + b.z + c.z + d.z) / 4.);
+
+        //just to make sure.
+        assert_eq!(SideOfPlane::Right, side_of_plane(&a, &b, &c, &d));
+
+        assert_eq!(SideOfPlane::Right, side_of_plane(&a, &b, &c, &center));
+        assert_eq!(SideOfPlane::Right, side_of_plane(&b, &a, &d, &center));
+        assert_eq!(SideOfPlane::Right, side_of_plane(&d, &c, &b, &center));
+        assert_eq!(SideOfPlane::Right, side_of_plane(&d, &b, &a, &center));
+    }
+
     #[quickcheck]
     fn quickcheck_test(a_pos: (f64, f64, f64), b_pos: (f64, f64, f64), c_pos: (f64, f64, f64), d_pos: (f64, f64, f64)) {
-        return;
         if a_pos == b_pos || a_pos == c_pos || a_pos == d_pos || b_pos == c_pos || b_pos == d_pos || c_pos == d_pos {
             return;
         }
@@ -144,7 +165,11 @@ mod tests {
             let vec = side_center - center;
             let on_the_other_side = center + (2.* vec);
 
-            assert_eq!(SideOfPlane::OnPlane, side_of_plane(&side.0, &side.1, &side.2, &center));
+            let result = side_of_plane(&side.0, &side.1, &side.2, &side_center);
+            if result != SideOfPlane::OnPlane {
+                panic!(format!("Expected p: {:?} to be on plane of {:?} {:?} {:?}", &side_center, &side.0, &side.1, &side.2));
+            }
+
             assert_eq!(SideOfPlane::Left, side_of_plane(&side.0, &side.1, &side.2, &on_the_other_side));
             assert_eq!(SideOfPlane::Right, side_of_plane(&side.0, &side.1, &side.2, &center))
         }
