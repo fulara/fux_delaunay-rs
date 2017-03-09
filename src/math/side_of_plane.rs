@@ -1,4 +1,7 @@
 use types::Point3;
+use types::Point3Err;
+use types::point3_err_from_point3;
+use math::F64Err;
 use cgmath::Matrix3;
 use cgmath::SquareMatrix;
 use math::order_float;
@@ -13,7 +16,11 @@ pub enum SideOfPlane {
 
 #[inline]
 pub fn side_of_plane(a: &Point3, b: &Point3, c: &Point3, p: &Point3) -> SideOfPlane {
-    //let x = 1i128;
+    let a = point3_err_from_point3(&a);
+    let b = point3_err_from_point3(&b);
+    let c = point3_err_from_point3(&c);
+    let p = point3_err_from_point3(&p);
+
     let ab = b - a;
     let ac = c - a;
     let ap = p - a;
@@ -22,7 +29,7 @@ pub fn side_of_plane(a: &Point3, b: &Point3, c: &Point3, p: &Point3) -> SideOfPl
                            ac.x, ac.y, ac.z,
                            ap.x, ap.y, ap.z).determinant();
 
-    let arr_x = [ab.x, ac.x, ap.x];
+   /* let arr_x = [ab.x, ac.x, ap.x];
     let arr_y = [ab.y, ac.y, ap.y];
     let arr_z = [ab.z, ac.z, ap.z];
 
@@ -40,19 +47,38 @@ pub fn side_of_plane(a: &Point3, b: &Point3, c: &Point3, p: &Point3) -> SideOfPl
     let max_y = max_val_y.max(min_val_y.abs());
     let max_z = max_val_z.max(min_val_z.abs());
 
-    //is there a need to include the ab/ac/ap calculation in the eps? I dont think so since the magnitude is different. not sure.
-    let eps = max_x * max_y * max_z * max_x * max_y * max_z * fp::EPSILON;
-    let eps = max_x * max_y * max_z * fp::EPSILON;
+    let eux = b.x.abs().max(a.x.abs());
+    let euy = b.y.abs().max(a.y.abs());
+    let euz = b.z.abs().max(a.z.abs());
 
-    //println!("det is: {:?} a {:?} b {:?} c {:?} p {:?} eps is: {:?}", det, a,b,c,p, eps);
+    let evx = c.x.abs().max(a.x.abs());
+    let evy = c.y.abs().max(a.y.abs());
+    let evz = c.z.abs().max(a.z.abs());
 
-    if det < -eps {
+    let ewx = p.x.abs().max(a.x.abs());
+    let ewy = p.y.abs().max(a.y.abs());
+    let ewz = p.z.abs().max(a.z.abs());
+
+    //self[0][0] * (self[1][1] * self[2][2] - self[2][1] * self[1][2]) -
+    //self[1][0] * (self[0][1] * self[2][2] - self[2][1] * self[0][2]) +
+    //self[2][0] * (self[0][1] * self[1][2] - self[1][1] * self[0][2])
+
+    let e = eux*((ac.y*ap.z).abs() + (ac.z*ap.y).abs()) + euy*((ac.z*ap.x).abs() + (ac.x*ap.z).abs()) + euz*((ac.x*ap.y).abs() + (ac.y*ap.x).abs())
+        + evx*((ab.y*ap.z).abs() + (ab.z*ap.y).abs()) + evy*((ab.z*ap.x).abs() + (ab.x*ap.z).abs()) + evz*((ab.x*ap.y).abs() + (ab.y*ap.x).abs())
+        + ewx*((ab.y*ac.z).abs() + (ab.z*ac.y).abs()) + ewy*((ab.z*ac.x).abs() + (ab.x*ac.z).abs()) + ewz*((ab.x*ac.y).abs() + (ab.y*ac.x).abs());
+
+    let eps = e.abs() * fp::EPSILON;
+
+    //println!("det is: {:?} a {:?} b {:?} c {:?} p {:?} eps is: {:?} e1 {} e2 {} e3 {} e4 {}", det, a,b,c,p, eps, e1, e2, e3, e4);
+*/
+    return SideOfPlane::Right;
+    /*if det < -eps {
         SideOfPlane::Right
     } else if det > eps {
         SideOfPlane::Left
     } else {
         SideOfPlane::OnPlane
-    }
+    }*/
 }
 
 

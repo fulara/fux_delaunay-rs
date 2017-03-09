@@ -8,6 +8,7 @@ mod n2_index;
 
 mod n3_index;
 mod point3;
+mod point3_err;
 mod tetrahedron;
 mod t4_index;
 mod triangulation3;
@@ -22,6 +23,7 @@ pub use self::triangulation2::*;
 
 pub use self::n3_index::*;
 pub use self::point3::*;
+pub use self::point3_err::*;
 pub use self::tetrahedron::*;
 pub use self::t4_index::*;
 pub use self::triangulation3::*;
