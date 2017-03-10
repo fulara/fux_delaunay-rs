@@ -29,56 +29,15 @@ pub fn side_of_plane(a: &Point3, b: &Point3, c: &Point3, p: &Point3) -> SideOfPl
                            ac.x, ac.y, ac.z,
                            ap.x, ap.y, ap.z).determinant();
 
-   /* let arr_x = [ab.x, ac.x, ap.x];
-    let arr_y = [ab.y, ac.y, ap.y];
-    let arr_z = [ab.z, ac.z, ap.z];
+    let eps = det.err_times_eps();
 
-    let max_val_x = arr_x.iter().max_by(order_float).unwrap();
-    let min_val_x = arr_x.iter().min_by(order_float).unwrap();
-
-    let max_val_y = arr_y.iter().max_by(order_float).unwrap();
-    let min_val_y = arr_y.iter().min_by(order_float).unwrap();
-
-    let max_val_z = arr_z.iter().max_by(order_float).unwrap();
-    let min_val_z = arr_z.iter().min_by(order_float).unwrap();
-
-
-    let max_x = max_val_x.max(min_val_x.abs());
-    let max_y = max_val_y.max(min_val_y.abs());
-    let max_z = max_val_z.max(min_val_z.abs());
-
-    let eux = b.x.abs().max(a.x.abs());
-    let euy = b.y.abs().max(a.y.abs());
-    let euz = b.z.abs().max(a.z.abs());
-
-    let evx = c.x.abs().max(a.x.abs());
-    let evy = c.y.abs().max(a.y.abs());
-    let evz = c.z.abs().max(a.z.abs());
-
-    let ewx = p.x.abs().max(a.x.abs());
-    let ewy = p.y.abs().max(a.y.abs());
-    let ewz = p.z.abs().max(a.z.abs());
-
-    //self[0][0] * (self[1][1] * self[2][2] - self[2][1] * self[1][2]) -
-    //self[1][0] * (self[0][1] * self[2][2] - self[2][1] * self[0][2]) +
-    //self[2][0] * (self[0][1] * self[1][2] - self[1][1] * self[0][2])
-
-    let e = eux*((ac.y*ap.z).abs() + (ac.z*ap.y).abs()) + euy*((ac.z*ap.x).abs() + (ac.x*ap.z).abs()) + euz*((ac.x*ap.y).abs() + (ac.y*ap.x).abs())
-        + evx*((ab.y*ap.z).abs() + (ab.z*ap.y).abs()) + evy*((ab.z*ap.x).abs() + (ab.x*ap.z).abs()) + evz*((ab.x*ap.y).abs() + (ab.y*ap.x).abs())
-        + ewx*((ab.y*ac.z).abs() + (ab.z*ac.y).abs()) + ewy*((ab.z*ac.x).abs() + (ab.x*ac.z).abs()) + ewz*((ab.x*ac.y).abs() + (ab.y*ac.x).abs());
-
-    let eps = e.abs() * fp::EPSILON;
-
-    //println!("det is: {:?} a {:?} b {:?} c {:?} p {:?} eps is: {:?} e1 {} e2 {} e3 {} e4 {}", det, a,b,c,p, eps, e1, e2, e3, e4);
-*/
-    return SideOfPlane::Right;
-    /*if det < -eps {
+    if det.val() < -eps {
         SideOfPlane::Right
-    } else if det > eps {
+    } else if det.val() > eps {
         SideOfPlane::Left
     } else {
         SideOfPlane::OnPlane
-    }*/
+    }
 }
 
 

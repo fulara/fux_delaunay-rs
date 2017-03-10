@@ -2,6 +2,8 @@ use std::ops::*;
 use ::cgmath::*;
 use cgmath::num_traits::*;
 
+use std::num::FpCategory;
+
 #[derive(Copy, Clone, PartialEq, Debug)]
 pub struct F64Err {
     val: f64,
@@ -36,6 +38,10 @@ impl F64Err {
 
     pub fn err(&self) -> f64 {
         self.err
+    }
+
+    pub fn err_times_eps(&self) -> f64 {
+        self.err * ::std::f64::EPSILON
     }
 }
 
@@ -230,8 +236,7 @@ impl ToPrimitive for F64Err {
 
 impl NumCast for F64Err {
     fn from<T>(t : T) -> Option<Self> {
-        //todo finish me.
-        Some(Self::new(0.))
+        unimplemented!();
     }
 }
 
@@ -246,15 +251,251 @@ impl Num for F64Err {
 impl BaseNum for F64Err {}
 
 impl ApproxEq for F64Err {
+    type Epsilon = Self;
+    fn default_epsilon() -> Self::Epsilon {
+        unimplemented!()
+    }
 
+    fn default_max_relative() -> Self::Epsilon {
+        unimplemented!()
+    }
+
+    fn default_max_ulps() -> u32 {
+        unimplemented!()
+    }
+
+    fn relative_eq(&self, other: &Self, epsilon: Self::Epsilon, max_relative: Self::Epsilon) -> bool {
+        unimplemented!()
+    }
+
+    fn ulps_eq(&self, other: &Self, epsilon: Self::Epsilon, max_ulps: u32) -> bool {
+        unimplemented!()
+    }
 }
 
 impl Neg for F64Err {
-
+    type Output = Self;
+    fn neg(self) -> Self::Output {
+        unimplemented!()
+    }
 }
 
 impl Float for F64Err {
+    fn nan() -> Self {
+        unimplemented!()
+    }
 
+    fn infinity() -> Self {
+        unimplemented!()
+    }
+
+    fn neg_infinity() -> Self {
+        unimplemented!()
+    }
+
+    fn neg_zero() -> Self {
+        unimplemented!()
+    }
+
+    fn min_value() -> Self {
+        unimplemented!()
+    }
+
+    fn min_positive_value() -> Self {
+        unimplemented!()
+    }
+
+    fn max_value() -> Self {
+        unimplemented!()
+    }
+
+    fn is_nan(self) -> bool {
+        unimplemented!()
+    }
+
+    fn is_infinite(self) -> bool {
+        unimplemented!()
+    }
+
+    fn is_finite(self) -> bool {
+        unimplemented!()
+    }
+
+    fn is_normal(self) -> bool {
+        unimplemented!()
+    }
+
+    fn classify(self) -> FpCategory {
+        unimplemented!()
+    }
+
+    fn floor(self) -> Self {
+        unimplemented!()
+    }
+
+    fn ceil(self) -> Self {
+        unimplemented!()
+    }
+
+    fn round(self) -> Self {
+        unimplemented!()
+    }
+
+    fn trunc(self) -> Self {
+        unimplemented!()
+    }
+
+    fn fract(self) -> Self {
+        unimplemented!()
+    }
+
+    fn abs(self) -> Self {
+        unimplemented!()
+    }
+
+    fn signum(self) -> Self {
+        unimplemented!()
+    }
+
+    fn is_sign_positive(self) -> bool {
+        unimplemented!()
+    }
+
+    fn is_sign_negative(self) -> bool {
+        unimplemented!()
+    }
+
+    fn mul_add(self, a: Self, b: Self) -> Self {
+        unimplemented!()
+    }
+
+    fn recip(self) -> Self {
+        unimplemented!()
+    }
+
+    fn powi(self, n: i32) -> Self {
+        unimplemented!()
+    }
+
+    fn powf(self, n: Self) -> Self {
+        unimplemented!()
+    }
+
+    fn sqrt(self) -> Self {
+        unimplemented!()
+    }
+
+    fn exp(self) -> Self {
+        unimplemented!()
+    }
+
+    fn exp2(self) -> Self {
+        unimplemented!()
+    }
+
+    fn ln(self) -> Self {
+        unimplemented!()
+    }
+
+    fn log(self, base: Self) -> Self {
+        unimplemented!()
+    }
+
+    fn log2(self) -> Self {
+        unimplemented!()
+    }
+
+    fn log10(self) -> Self {
+        unimplemented!()
+    }
+
+    fn max(self, other: Self) -> Self {
+        unimplemented!()
+    }
+
+    fn min(self, other: Self) -> Self {
+        unimplemented!()
+    }
+
+    fn abs_sub(self, other: Self) -> Self {
+        unimplemented!()
+    }
+
+    fn cbrt(self) -> Self {
+        unimplemented!()
+    }
+
+    fn hypot(self, other: Self) -> Self {
+        unimplemented!()
+    }
+
+    fn sin(self) -> Self {
+        unimplemented!()
+    }
+
+    fn cos(self) -> Self {
+        unimplemented!()
+    }
+
+    fn tan(self) -> Self {
+        unimplemented!()
+    }
+
+    fn asin(self) -> Self {
+        unimplemented!()
+    }
+
+    fn acos(self) -> Self {
+        unimplemented!()
+    }
+
+    fn atan(self) -> Self {
+        unimplemented!()
+    }
+
+    fn atan2(self, other: Self) -> Self {
+        unimplemented!()
+    }
+
+    fn sin_cos(self) -> (Self, Self) {
+        unimplemented!()
+    }
+
+    fn exp_m1(self) -> Self {
+        unimplemented!()
+    }
+
+    fn ln_1p(self) -> Self {
+        unimplemented!()
+    }
+
+    fn sinh(self) -> Self {
+        unimplemented!()
+    }
+
+    fn cosh(self) -> Self {
+        unimplemented!()
+    }
+
+    fn tanh(self) -> Self {
+        unimplemented!()
+    }
+
+    fn asinh(self) -> Self {
+        unimplemented!()
+    }
+
+    fn acosh(self) -> Self {
+        unimplemented!()
+    }
+
+    fn atanh(self) -> Self {
+        unimplemented!()
+    }
+
+    fn integer_decode(self) -> (u64, i16, i8) {
+        unimplemented!()
+    }
 }
 
 impl BaseFloat for F64Err {
