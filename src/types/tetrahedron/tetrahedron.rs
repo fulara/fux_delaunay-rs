@@ -79,22 +79,22 @@ impl Tetrahedron {
     }
 
     #[inline]
-    pub fn edges_as_indices_tuples(&self) -> [(N3Index, N3Index, N3Index); 4] {
+    pub fn faces_as_indices_tuples(&self) -> [(N3Index, N3Index, N3Index); 4] {
         [
             (self.index_a(), self.index_b(), self.index_c()),
             (self.index_b(), self.index_a(), self.index_d()),
             (self.index_d(), self.index_c(), self.index_b()),
-            (self.index_d(), self.index_b(), self.index_a()),
+            (self.index_d(), self.index_a(), self.index_c()),
         ]
     }
 
     #[inline]
-    pub fn edges_as_points_tuples<'a>(&self, points: &'a [Point3]) -> [(&'a Point3, &'a Point3, &'a Point3); 4] {
+    pub fn faces_as_points_tuples<'a>(&self, points: &'a [Point3]) -> [(&'a Point3, &'a Point3, &'a Point3); 4] {
         [
             (self.a(points), self.b(points), self.c(points)),
             (self.b(points), self.a(points), self.d(points)),
             (self.d(points), self.c(points), self.b(points)),
-            (self.d(points), self.b(points), self.a(points))
+            (self.d(points), self.a(points), self.c(points))
         ]
     }
 
@@ -122,16 +122,18 @@ impl Tetrahedron {
     pub fn get_neighbor_index(&self, n1: N3Index, n2: N3Index, n3: N3Index) -> usize {
         //TODO this could all be eliminated if the elements and neighboring were ordered correctly,
 
+        println!("got here.");
         let sorted_input = sort_3(n1, n2, n3);
-        for edge_index in 0..self.edges_as_indices_tuples().len() {
-            let edge = self.edges_as_indices_tuples()[edge_index];
+        for edge_index in 0..self.faces_as_indices_tuples().len() {
+            let edge = self.faces_as_indices_tuples()[edge_index];
             let sorted_edge = sort_3(edge.0, edge.1, edge.2);
 
+            println!("sorted input {:?} sorted_edge {:?}", sorted_input, sorted_edge);
             if sorted_edge.0 == sorted_input.0 && sorted_edge.1 == sorted_input.1 && sorted_edge.2 == sorted_input.2 {
                 return edge_index;
             }
         }
-        panic!("get_neighbor_index invoked with indices not belonging to this element. n1: '{:?}' n2: '{:?}' n3: '{:?}'", n1, n2, n3);
+        panic!("get_neighbor_index invoked with indices not belonging to this element. n1: '{:?}' n2: '{:?}' n3: '{:?}' self.v '{:?}'", n1, n2, n3, self.v);
     }
 
     #[inline]

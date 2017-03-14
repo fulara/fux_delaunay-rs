@@ -14,7 +14,7 @@ impl Triangulation3Neighborhood {
     }
 
     pub fn register_tetrahedron(&mut self, tetra: &Tetrahedron, tetra_index: T4Index) {
-        for edge_indices in tetra.edges_as_indices_tuples().iter() {
+        for edge_indices in tetra.faces_as_indices_tuples().iter() {
             self.register_connection(edge_indices.0, edge_indices.1, edge_indices.2, tetra_index);
         }
     }

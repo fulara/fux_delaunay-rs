@@ -133,9 +133,9 @@ mod tests {
 
                 assert_eq!(1, tr.elements().len());
                 assert_eq!(N3Index(0), tr.elements()[0].index_a());
-                assert_eq!(N3Index(1), tr.elements()[0].index_b());
+                assert_eq!(N3Index(1), tr.elements()[0].index_d());
                 assert_eq!(N3Index(2), tr.elements()[0].index_c());
-                assert_eq!(N3Index(3), tr.elements()[0].index_d());
+                assert_eq!(N3Index(3), tr.elements()[0].index_b());
             }
             Err(str) => panic!("Expected success here got err: '{}'", str)
         }

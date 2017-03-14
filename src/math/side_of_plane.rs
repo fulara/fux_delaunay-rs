@@ -1,7 +1,6 @@
 use types::Point3;
 use types::Point3Err;
 use types::point3_err_from_point3;
-use math::F64Err;
 use cgmath::Matrix3;
 use cgmath::SquareMatrix;
 use math::order_float;
@@ -120,7 +119,7 @@ mod tests {
         assert_eq!(SideOfPlane::Right, side_of_plane(&a, &b, &c, &center));
         assert_eq!(SideOfPlane::Right, side_of_plane(&b, &a, &d, &center));
         assert_eq!(SideOfPlane::Right, side_of_plane(&d, &c, &b, &center));
-        assert_eq!(SideOfPlane::Right, side_of_plane(&d, &b, &a, &center));
+        assert_eq!(SideOfPlane::Right, side_of_plane(&d, &a, &c, &center));
     }
 
     #[quickcheck]
@@ -140,7 +139,7 @@ mod tests {
             return;
         }
 
-        let sides = [(a, b, c), (b, a, d), (d, c, b), (d, b, a)];
+        let sides = [(a, b, c), (b, a, d), (d, c, b), (d, a, c)];
 
         assert_eq!(SideOfPlane::Right, side_of_plane(&a, &b, &c, &d));
         let center = Point3::new((a.x + b.x + c.x + d.x) / 4., (a.y + b.y + c.y + d.y) / 4., (a.z + b.z + c.z + d.z) / 4.);

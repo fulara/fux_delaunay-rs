@@ -12,6 +12,8 @@ extern crate cgmath;
 
 extern crate rustc_serialize;
 
+extern crate err_prop;
+
 pub mod math;
 pub mod types;
 pub mod io;
