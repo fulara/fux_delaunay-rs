@@ -31,7 +31,6 @@ pub fn locate_element_containing(start_lookup_at: T4Index, elements: &[Tetrahedr
 
             let edge = ele.faces_as_points_tuples(nodes)[current_face];
 
-            println!("matching no {:?} face. point is: {:?} result is {:?} edges: {:?} {:?} {:?}", current_face, p, math::side_of_plane(edge.0, edge.1, edge.2, p), edge.0, edge.1, edge.2);
             match math::side_of_plane(edge.0, edge.1, edge.2, p) {
                 math::SideOfPlane::Left => {
                     assert!(ele.get_neighbor_from_index(current_face).is_some());
@@ -44,7 +43,6 @@ pub fn locate_element_containing(start_lookup_at: T4Index, elements: &[Tetrahedr
                         panic!("found node on more than 2 planes.");
                     }
                     if let Some(on_face_found) = on_face_found {
-                        println!("found on faces...");
                         on_faces_found = Some((on_face_found, current_face));
                     } else {
                         on_face_found = Some(current_face)
@@ -56,12 +54,12 @@ pub fn locate_element_containing(start_lookup_at: T4Index, elements: &[Tetrahedr
         }
 
         if current_face == 4 {
-            if let Some(on_edge_found) = on_face_found {
-                return LocationResult::OnFace(ele_index, on_edge_found);
-            }
-
             if let Some((face1, face2)) = on_faces_found {
                 return LocationResult::OnFaces(ele_index, on_faces_found.unwrap().0, on_faces_found.unwrap().1)
+            }
+
+            if let Some(on_edge_found) = on_face_found {
+                return LocationResult::OnFace(ele_index, on_edge_found);
             }
 
             return LocationResult::InElement(ele_index);
@@ -77,6 +75,8 @@ mod tests {
     use types::N3Index;
     use types::T4Index;
     use types::Triangulation3;
+    use types::triangulation3_initiation::create_initial_tetra_set;
+    use types::triangulation3_test_utils::get_example_initial_point_set;
     use std::collections::BTreeSet;
     use super::*;
 
@@ -90,7 +90,6 @@ mod tests {
         let t0 = Tetrahedron::new(&pts, N3Index(0), N3Index(1), N3Index(2), N3Index(3));
         let eles = vec![t0.clone()];
 
-        println!("t0 is {:?}", t0);
         let point_inside = t0.create_center_point(&pts);// Point3::new(0.1, 0.1, 0.1);
 
         assert_eq!(LocationResult::InElement(T4Index(0)), locate_element_containing(T4Index(0), &eles, &pts, &point_inside));
@@ -120,10 +119,24 @@ mod tests {
         assert_eq! (LocationResult::InElement(T4Index(0)), locate_element_containing(T4Index(1), triangulation.elements(), triangulation.nodes(), &center0));
         assert_eq!(LocationResult::InElement(T4Index(1)), locate_element_containing(T4Index(1), triangulation.elements(), triangulation.nodes(), &center1));
 
+        perform_tests(&triangulation);
+    }
+
+    #[test]
+    fn finding_element_using_initial_triangulation() {
+        let nodes = get_example_initial_point_set();
+        let elements = create_initial_tetra_set(&nodes);
+
+        let triangulation = Triangulation3::new_from_prebuilt_triangulation(nodes, elements);
+
+        perform_tests(&triangulation);
+    }
+
+    fn perform_tests(triangulation : &Triangulation3) {
         for elem_index in 0..triangulation.elements().len() {
-            for face_index in 0..triangulation.elements()[elem_index].faces_as_points_tuples(&pts).len() {
+            for face_index in 0..triangulation.elements()[elem_index].faces_as_points_tuples(triangulation.nodes()).len() {
                 let e = &triangulation.elements()[elem_index];
-                let face = e.faces_as_points_tuples(&pts)[face_index];
+                let face = e.faces_as_points_tuples(triangulation.nodes())[face_index];
                 let x = (face.0.x + face.1.x + face.2.x) / 3.;
                 let y = (face.0.y + face.1.y + face.2.y) / 3.;
                 let z = (face.0.z + face.1.z + face.2.z) / 3.;
@@ -135,7 +148,7 @@ mod tests {
 
                 //now we need two faces. so just iterate again to get the 2nd.
                 for face_index_second in 0..face_index {
-                    let face_2 = e.faces_as_points_tuples(&pts)[face_index_second];
+                    let face_2 = e.faces_as_points_tuples(triangulation.nodes())[face_index_second];
 
                     let common_nodes = find_common_nodes(e.faces_as_indices_tuples()[face_index], e.faces_as_indices_tuples()[face_index_second]);
                     let x = (triangulation.nodes()[(common_nodes.0).0].x + triangulation.nodes()[(common_nodes.1).0].x) / 2.;
@@ -144,7 +157,7 @@ mod tests {
 
                     let edge_center = Point3::new(x, y, z);
 
-                    assert_eq!(LocationResult::OnFaces(T4Index(elem_index), face_index, face_index_second),
+                    assert_eq!(LocationResult::OnFaces(T4Index(elem_index), face_index_second, face_index),
                     locate_element_containing(T4Index(elem_index), triangulation.elements(), triangulation.nodes(), &edge_center));
                 }
             }
@@ -156,7 +169,6 @@ mod tests {
         let b: BTreeSet<_> = [face_2.0, face_2.1, face_2.2].iter().cloned().collect();
 
         let intersection: BTreeSet<_> = a.intersection(&b).collect();
-        println!("a {:?} b {:?}", a, b);
         assert_eq!(2, intersection.len());
 
         {
