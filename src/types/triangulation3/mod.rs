@@ -1,5 +1,6 @@
 mod triangulation3;
 mod triangulation3_neighborhood;
+mod triangulation3_insertion;
 
 pub mod triangulation3_initiation;
 
