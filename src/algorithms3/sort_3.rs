@@ -24,7 +24,7 @@ mod tests {
 
     #[quickcheck]
     fn sort3_test(a: usize, b: usize, c: usize) {
-        let sorted = super::sort_3(N3Index(a),N3Index(b),N3Index(c));
+        let sorted = super::sort_3(N3Index(a), N3Index(b), N3Index(c));
 
         assert!(sorted.0 <= sorted.1);
         assert!(sorted.1 <= sorted.2);

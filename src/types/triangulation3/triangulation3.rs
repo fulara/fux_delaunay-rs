@@ -13,8 +13,14 @@ pub struct Triangulation3 {
 
 impl Triangulation3 {
     #[inline]
-    pub fn new_from_prebuilt_triangulation(nodes: Vec<Point3>, elements: Vec<Tetrahedron>) -> Triangulation3 {
-        let mut tr = Triangulation3 { nodes: nodes, elements: elements, last_added_element_index: T4Index(0) };
+    pub fn new_from_prebuilt_triangulation(nodes: Vec<Point3>,
+                                           elements: Vec<Tetrahedron>)
+                                           -> Triangulation3 {
+        let mut tr = Triangulation3 {
+            nodes: nodes,
+            elements: elements,
+            last_added_element_index: T4Index(0),
+        };
 
         Triangulation3Neighborhood::teach_triangles_of_neighborhood(&mut tr.elements);
         tr

@@ -19,7 +19,12 @@ impl Triangulation3Neighborhood {
         }
     }
 
-    pub fn get_neighbor(&self, p1: N3Index, p2: N3Index, p3: N3Index, tetra_index: T4Index) -> Option<T4Index> {
+    pub fn get_neighbor(&self,
+                        p1: N3Index,
+                        p2: N3Index,
+                        p3: N3Index,
+                        tetra_index: T4Index)
+                        -> Option<T4Index> {
         let (smaller, medium, larger) = sort_3(p1, p2, p3);
 
         let v = &self.triangle_neighborhood[smaller.0];
@@ -53,18 +58,25 @@ impl Triangulation3Neighborhood {
         }
 
         for n_smaller_index in 0..neighborhood.triangle_neighborhood.len() {
-            for &(n_medium_index, ref innest_vec) in neighborhood.triangle_neighborhood[n_smaller_index].iter() {
+            for &(n_medium_index, ref innest_vec) in
+                neighborhood.triangle_neighborhood[n_smaller_index].iter() {
                 for &(n_largest_index, opt_t1, opt_t2) in innest_vec.iter() {
                     if let (Some(t1), Some(t2)) = (opt_t1, opt_t2) {
                         {
                             let el1: &mut Tetrahedron = &mut elements[t1.0];
-                            let neighbor_index = el1.get_neighbor_index(N3Index(n_smaller_index), n_medium_index, n_largest_index);
+                            let neighbor_index =
+                                el1.get_neighbor_index(N3Index(n_smaller_index),
+                                                       n_medium_index,
+                                                       n_largest_index);
 
                             el1.set_neighbor(neighbor_index, Some(t2));
                         }
                         {
                             let el2: &mut Tetrahedron = &mut elements[t2.0];
-                            let neighbor_index = el2.get_neighbor_index(N3Index(n_smaller_index), n_medium_index, n_largest_index);
+                            let neighbor_index =
+                                el2.get_neighbor_index(N3Index(n_smaller_index),
+                                                       n_medium_index,
+                                                       n_largest_index);
 
                             el2.set_neighbor(neighbor_index, Some(t1));
                         }
@@ -74,8 +86,12 @@ impl Triangulation3Neighborhood {
         }
     }
 
-    fn register_connection(&mut self, p1: N3Index, p2: N3Index, p3: N3Index, tetra_index: T4Index) {
-        let (smaller, medium, larger) =  sort_3(p1, p2, p3);
+    fn register_connection(&mut self,
+                           p1: N3Index,
+                           p2: N3Index,
+                           p3: N3Index,
+                           tetra_index: T4Index) {
+        let (smaller, medium, larger) = sort_3(p1, p2, p3);
 
         if self.triangle_neighborhood.len() < larger.0 {
             self.triangle_neighborhood.resize(larger.0, Vec::new());
@@ -104,7 +120,7 @@ impl Triangulation3Neighborhood {
             }
         }
 
-        v.push((medium, vec!((larger, Some(tetra_index), None))));
+        v.push((medium, vec![(larger, Some(tetra_index), None)]));
     }
 }
 
@@ -121,7 +137,11 @@ mod tests {
 
     #[test]
     fn testing_neighborhood() {
-        let points = vec![Point3::new(0., 0., 0.), Point3::new(100., 0., 0.), Point3::new(0., 100., 0.), Point3::new(0., 0., 100.), Point3::new(100., 100., 0.)];
+        let points = vec![Point3::new(0., 0., 0.),
+                          Point3::new(100., 0., 0.),
+                          Point3::new(0., 100., 0.),
+                          Point3::new(0., 0., 100.),
+                          Point3::new(100., 100., 0.)];
 
         let t0 = Tetrahedron::new(&points, N3Index(0), N3Index(1), N3Index(2), N3Index(3));
         let t1 = Tetrahedron::new(&points, N3Index(1), N3Index(2), N3Index(3), N3Index(4));
@@ -131,18 +151,27 @@ mod tests {
         neighborhood.register_tetrahedron(&t0, T4Index(0));
         neighborhood.register_tetrahedron(&t1, T4Index(1));
 
-        assert_eq!(Option::None, neighborhood.get_neighbor(N3Index(0), N3Index(1), N3Index(2), T4Index(0)));
-        assert_eq!(Some(T4Index(1)), neighborhood.get_neighbor(N3Index(1), N3Index(2), N3Index(3), T4Index(0)));
-        assert_eq!(Option::None, neighborhood.get_neighbor(N3Index(2), N3Index(3), N3Index(0), T4Index(0)));
-        assert_eq!(Option::None, neighborhood.get_neighbor(N3Index(3), N3Index(0), N3Index(1), T4Index(0)));
+        assert_eq!(Option::None,
+                   neighborhood.get_neighbor(N3Index(0), N3Index(1), N3Index(2), T4Index(0)));
+        assert_eq!(Some(T4Index(1)),
+                   neighborhood.get_neighbor(N3Index(1), N3Index(2), N3Index(3), T4Index(0)));
+        assert_eq!(Option::None,
+                   neighborhood.get_neighbor(N3Index(2), N3Index(3), N3Index(0), T4Index(0)));
+        assert_eq!(Option::None,
+                   neighborhood.get_neighbor(N3Index(3), N3Index(0), N3Index(1), T4Index(0)));
 
-        assert_eq!(Some(T4Index(1)), neighborhood.get_neighbor(N3Index(3), N3Index(2), N3Index(1), T4Index(0)));
+        assert_eq!(Some(T4Index(1)),
+                   neighborhood.get_neighbor(N3Index(3), N3Index(2), N3Index(1), T4Index(0)));
 
 
-        assert_eq!(Some(T4Index(0)), neighborhood.get_neighbor(N3Index(1), N3Index(2), N3Index(3), T4Index(1)));
-        assert_eq!(None, neighborhood.get_neighbor(N3Index(2), N3Index(3), N3Index(4), T4Index(1)));
-        assert_eq!(None, neighborhood.get_neighbor(N3Index(3), N3Index(4), N3Index(1), T4Index(1)));
-        assert_eq!(None, neighborhood.get_neighbor(N3Index(4), N3Index(1), N3Index(2), T4Index(1)));
+        assert_eq!(Some(T4Index(0)),
+                   neighborhood.get_neighbor(N3Index(1), N3Index(2), N3Index(3), T4Index(1)));
+        assert_eq!(None,
+                   neighborhood.get_neighbor(N3Index(2), N3Index(3), N3Index(4), T4Index(1)));
+        assert_eq!(None,
+                   neighborhood.get_neighbor(N3Index(3), N3Index(4), N3Index(1), T4Index(1)));
+        assert_eq!(None,
+                   neighborhood.get_neighbor(N3Index(4), N3Index(1), N3Index(2), T4Index(1)));
 
         let mut tr = vec![t0, t1];
 
@@ -174,29 +203,49 @@ mod tests {
         assert_eq!(&[N3Index(1),N3Index(3),N3Index(4),N3Index(6)],tetras[4].nodes());
         */
 
-        assert_eq!(None,eles[0].get_neighbor_for_indices(N3Index(0),N3Index(3),N3Index(4)));
-        assert_eq!(Some(T4Index(4)),eles[0].get_neighbor_for_indices(N3Index(3),N3Index(4),N3Index(1)));
-        assert_eq!(None,eles[0].get_neighbor_for_indices(N3Index(4),N3Index(1),N3Index(0)));
-        assert_eq!(None,eles[0].get_neighbor_for_indices(N3Index(1),N3Index(0),N3Index(3)));
+        assert_eq!(None,
+                   eles[0].get_neighbor_for_indices(N3Index(0), N3Index(3), N3Index(4)));
+        assert_eq!(Some(T4Index(4)),
+                   eles[0].get_neighbor_for_indices(N3Index(3), N3Index(4), N3Index(1)));
+        assert_eq!(None,
+                   eles[0].get_neighbor_for_indices(N3Index(4), N3Index(1), N3Index(0)));
+        assert_eq!(None,
+                   eles[0].get_neighbor_for_indices(N3Index(1), N3Index(0), N3Index(3)));
 
-        assert_eq!(None,eles[1].get_neighbor_for_indices(N3Index(1),N3Index(2),N3Index(3)));
-        assert_eq!(None,eles[1].get_neighbor_for_indices(N3Index(2),N3Index(3),N3Index(6)));
-        assert_eq!(Some(T4Index(4)),eles[1].get_neighbor_for_indices(N3Index(3),N3Index(6),N3Index(1)));
-        assert_eq!(None,eles[1].get_neighbor_for_indices(N3Index(6),N3Index(1),N3Index(2)));
+        assert_eq!(None,
+                   eles[1].get_neighbor_for_indices(N3Index(1), N3Index(2), N3Index(3)));
+        assert_eq!(None,
+                   eles[1].get_neighbor_for_indices(N3Index(2), N3Index(3), N3Index(6)));
+        assert_eq!(Some(T4Index(4)),
+                   eles[1].get_neighbor_for_indices(N3Index(3), N3Index(6), N3Index(1)));
+        assert_eq!(None,
+                   eles[1].get_neighbor_for_indices(N3Index(6), N3Index(1), N3Index(2)));
 
-        assert_eq!(None,eles[2].get_neighbor_for_indices(N3Index(1),N3Index(4),N3Index(5)));
-        assert_eq!(None,eles[2].get_neighbor_for_indices(N3Index(4),N3Index(5),N3Index(6)));
-        assert_eq!(None,eles[2].get_neighbor_for_indices(N3Index(5),N3Index(6),N3Index(1)));
-        assert_eq!(Some(T4Index(4)),eles[2].get_neighbor_for_indices(N3Index(6),N3Index(1),N3Index(4)));
+        assert_eq!(None,
+                   eles[2].get_neighbor_for_indices(N3Index(1), N3Index(4), N3Index(5)));
+        assert_eq!(None,
+                   eles[2].get_neighbor_for_indices(N3Index(4), N3Index(5), N3Index(6)));
+        assert_eq!(None,
+                   eles[2].get_neighbor_for_indices(N3Index(5), N3Index(6), N3Index(1)));
+        assert_eq!(Some(T4Index(4)),
+                   eles[2].get_neighbor_for_indices(N3Index(6), N3Index(1), N3Index(4)));
 
-        assert_eq!(Some(T4Index(4)),eles[3].get_neighbor_for_indices(N3Index(3),N3Index(4),N3Index(6)));
-        assert_eq!(None,eles[3].get_neighbor_for_indices(N3Index(4),N3Index(6),N3Index(7)));
-        assert_eq!(None,eles[3].get_neighbor_for_indices(N3Index(6),N3Index(7),N3Index(3)));
-        assert_eq!(None,eles[3].get_neighbor_for_indices(N3Index(7),N3Index(3),N3Index(4)));
+        assert_eq!(Some(T4Index(4)),
+                   eles[3].get_neighbor_for_indices(N3Index(3), N3Index(4), N3Index(6)));
+        assert_eq!(None,
+                   eles[3].get_neighbor_for_indices(N3Index(4), N3Index(6), N3Index(7)));
+        assert_eq!(None,
+                   eles[3].get_neighbor_for_indices(N3Index(6), N3Index(7), N3Index(3)));
+        assert_eq!(None,
+                   eles[3].get_neighbor_for_indices(N3Index(7), N3Index(3), N3Index(4)));
 
-        assert_eq!(Some(T4Index(0)),eles[4].get_neighbor_for_indices(N3Index(1),N3Index(3),N3Index(4)));
-        assert_eq!(Some(T4Index(3)),eles[4].get_neighbor_for_indices(N3Index(3),N3Index(4),N3Index(6)));
-        assert_eq!(Some(T4Index(2)),eles[4].get_neighbor_for_indices(N3Index(4),N3Index(6),N3Index(1)));
-        assert_eq!(Some(T4Index(1)),eles[4].get_neighbor_for_indices(N3Index(6),N3Index(1),N3Index(3)));
+        assert_eq!(Some(T4Index(0)),
+                   eles[4].get_neighbor_for_indices(N3Index(1), N3Index(3), N3Index(4)));
+        assert_eq!(Some(T4Index(3)),
+                   eles[4].get_neighbor_for_indices(N3Index(3), N3Index(4), N3Index(6)));
+        assert_eq!(Some(T4Index(2)),
+                   eles[4].get_neighbor_for_indices(N3Index(4), N3Index(6), N3Index(1)));
+        assert_eq!(Some(T4Index(1)),
+                   eles[4].get_neighbor_for_indices(N3Index(6), N3Index(1), N3Index(3)));
     }
 }

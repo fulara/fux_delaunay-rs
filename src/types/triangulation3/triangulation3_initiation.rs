@@ -2,17 +2,17 @@ use types::Tetrahedron;
 use types::Point3;
 use types::N3Index;
 
-pub fn create_initial_tetra_set(nodes : &[Point3]) -> Vec<Tetrahedron> {
+pub fn create_initial_tetra_set(nodes: &[Point3]) -> Vec<Tetrahedron> {
     assert_nodes(nodes);
 
-    vec!(Tetrahedron::new(nodes, N3Index(0),N3Index(1),N3Index(4),N3Index(3)),
-         Tetrahedron::new(nodes, N3Index(1),N3Index(2),N3Index(3),N3Index(6)),
-         Tetrahedron::new(nodes, N3Index(1),N3Index(4),N3Index(5),N3Index(6)),
-         Tetrahedron::new(nodes, N3Index(3),N3Index(4),N3Index(6),N3Index(7)),
-         Tetrahedron::new(nodes, N3Index(1),N3Index(3),N3Index(4),N3Index(6)))
+    vec![Tetrahedron::new(nodes, N3Index(0), N3Index(1), N3Index(4), N3Index(3)),
+         Tetrahedron::new(nodes, N3Index(1), N3Index(2), N3Index(3), N3Index(6)),
+         Tetrahedron::new(nodes, N3Index(1), N3Index(4), N3Index(5), N3Index(6)),
+         Tetrahedron::new(nodes, N3Index(3), N3Index(4), N3Index(6), N3Index(7)),
+         Tetrahedron::new(nodes, N3Index(1), N3Index(3), N3Index(4), N3Index(6))]
 }
 
-fn assert_nodes(nodes : &[Point3]) {
+fn assert_nodes(nodes: &[Point3]) {
     assert!(nodes.len() == 8);
 
     assert!(nodes[0].z == nodes[1].z);
@@ -59,12 +59,16 @@ mod tests {
         //does this take makes sense? probably not.
 
         assert_eq!(5, tetras.len());
-        assert_eq!(&[N3Index(0),N3Index(3),N3Index(4),N3Index(1)],tetras[0].nodes());
-        assert_eq!(&[N3Index(1),N3Index(2),N3Index(3),N3Index(6)],tetras[1].nodes());
-        assert_eq!(&[N3Index(1),N3Index(4),N3Index(5),N3Index(6)],tetras[2].nodes());
-        assert_eq!(&[N3Index(3),N3Index(4),N3Index(6),N3Index(7)],tetras[3].nodes());
-        assert_eq!(&[N3Index(1),N3Index(3),N3Index(4),N3Index(6)],tetras[4].nodes());
+        assert_eq!(&[N3Index(0), N3Index(3), N3Index(4), N3Index(1)],
+                   tetras[0].nodes());
+        assert_eq!(&[N3Index(1), N3Index(2), N3Index(3), N3Index(6)],
+                   tetras[1].nodes());
+        assert_eq!(&[N3Index(1), N3Index(4), N3Index(5), N3Index(6)],
+                   tetras[2].nodes());
+        assert_eq!(&[N3Index(3), N3Index(4), N3Index(6), N3Index(7)],
+                   tetras[3].nodes());
+        assert_eq!(&[N3Index(1), N3Index(3), N3Index(4), N3Index(6)],
+                   tetras[4].nodes());
 
     }
 }
-

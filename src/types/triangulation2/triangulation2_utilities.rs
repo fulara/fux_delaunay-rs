@@ -1,7 +1,8 @@
 use types::Point2;
 
 pub fn find_corner_nodes(nodes: &[Point2]) -> (usize, usize, usize, usize) {
-    let (mut top_left_index, mut top_right_index, mut bottom_left_index, mut bottom_right_index) = (0usize, 0usize, 0usize, 0usize);
+    let (mut top_left_index, mut top_right_index, mut bottom_left_index, mut bottom_right_index) =
+        (0usize, 0usize, 0usize, 0usize);
 
     for i in 1..nodes.len() {
         let candidate = nodes[i];
@@ -36,7 +37,11 @@ mod tests {
 
     #[test]
     fn test() {
-        let nodes = [Point2::new(5., 5.), Point2::new(0., 0.), Point2::new(0., 10.), Point2::new(10., 10.), Point2::new(10., 0.)];
+        let nodes = [Point2::new(5., 5.),
+                     Point2::new(0., 0.),
+                     Point2::new(0., 10.),
+                     Point2::new(10., 10.),
+                     Point2::new(10., 0.)];
 
         assert_eq!((2, 3, 1, 4), find_corner_nodes(&nodes));
     }

@@ -5,13 +5,15 @@ use std::fs::File;
 
 fn write_2d_to_abaqus_format_impl<W: Write>(buf: BufWriter<W>, triangulation: &Triangulation2) {
     AbaqusWriter {
-        writer: buf,
-        triangulation: triangulation
-    }.write();
+            writer: buf,
+            triangulation: triangulation,
+        }
+        .write();
 }
 
 pub fn write_2d_to_abaqus_format(path_to_file: &str, triangulation: &Triangulation2) {
-    let f = File::create(path_to_file).expect(&format!("write_to_abaqus_format failed while opening file: {}", path_to_file));
+    let f = File::create(path_to_file).expect(&
+        format!("write_to_abaqus_format failed while opening file: {}", path_to_file));
 
     let buf = BufWriter::new(f);
     write_2d_to_abaqus_format_impl(buf, triangulation);
@@ -49,7 +51,12 @@ impl<'a, W: Write> AbaqusWriter<'a, W> {
         for i in 0..self.triangulation.elements().len() {
             let element = &self.triangulation.elements()[i];
             //abaqus uses ccw order instead of cw, writing nodes in order [cab] is required.
-            let _ = self.writer.write(format!("{},\t{},\t{},\t{}\n", i + 1, element.index_c().0 + 1, element.index_b().0 + 1, element.index_a().0 + 1).as_bytes());
+            let _ = self.writer.write(format!("{},\t{},\t{},\t{}\n",
+                                              i + 1,
+                                              element.index_c().0 + 1,
+                                              element.index_b().0 + 1,
+                                              element.index_a().0 + 1)
+                                              .as_bytes());
         }
     }
 
@@ -86,7 +93,8 @@ impl<'a, W: Write> AbaqusWriter<'a, W> {
 *Instance, name=PART-1-1, part=PART-1
 *End Instance
 **
-*End Assembly\n".as_bytes());
+*End Assembly\n"
+                                          .as_bytes());
     }
 }
 
@@ -94,12 +102,16 @@ impl<'a, W: Write> AbaqusWriter<'a, W> {
 mod tests {
     use super::*;
     use types::*;
-    use std::io::{BufWriter};
+    use std::io::BufWriter;
 
     #[test]
     fn testing_bufwriter_and_string() {
-        let nodes = vec![Point2::new(0., 0.), Point2::new(1., 0.), Point2::new(1., 1.), Point2::new(0., 1.)];
-        let eles = vec![Triangle::new(&nodes, N2Index(0), N2Index(1), N2Index(2)), Triangle::new(&nodes, N2Index(0), N2Index(2), N2Index(3))];
+        let nodes = vec![Point2::new(0., 0.),
+                         Point2::new(1., 0.),
+                         Point2::new(1., 1.),
+                         Point2::new(0., 1.)];
+        let eles = vec![Triangle::new(&nodes, N2Index(0), N2Index(1), N2Index(2)),
+                        Triangle::new(&nodes, N2Index(0), N2Index(2), N2Index(3))];
         let triangulation = Triangulation2::new_from_prebuilt_triangulation(nodes, eles);
         //let tr
         let mut s = String::new();

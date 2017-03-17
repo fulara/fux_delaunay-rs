@@ -8,25 +8,28 @@ use types::t3_index::T3Index;
 pub struct Triangle {
     v: [N2Index; 3],
 
-    n: [Option<T3Index>; 3]
+    n: [Option<T3Index>; 3],
 }
 
 impl Triangle {
     #[inline]
     pub fn new(points: &[Point2], a: N2Index, b: N2Index, c: N2Index) -> Triangle {
         if Self::is_ordered_correctly(&points[a.0], &points[b.0], &points[c.0]) {
-            Triangle { v: [a, b, c], n: [None, None, None] }
+            Triangle {
+                v: [a, b, c],
+                n: [None, None, None],
+            }
         } else {
-            Triangle { v: [a, c, b], n: [None, None, None] }
+            Triangle {
+                v: [a, c, b],
+                n: [None, None, None],
+            }
         }
     }
 
     #[inline]
     pub fn new_exact(v: [N2Index; 3], n: [Option<T3Index>; 3]) -> Triangle {
-        Triangle {
-            v: v,
-            n: n,
-        }
+        Triangle { v: v, n: n }
     }
 
     #[inline]
@@ -84,17 +87,16 @@ impl Triangle {
     }
 
     #[inline]
-    pub fn edges_as_points_tuples<'a>(&self, points: &'a [Point2]) -> [(&'a Point2, &'a Point2); 3] {
-        [
-            (self.a(points), self.b(points)),
-            (self.b(points), self.c(points)),
-            (self.c(points), self.a(points))
-        ]
+    pub fn edges_as_points_tuples<'a>(&self,
+                                      points: &'a [Point2])
+                                      -> [(&'a Point2, &'a Point2); 3] {
+        [(self.a(points), self.b(points)),
+         (self.b(points), self.c(points)),
+         (self.c(points), self.a(points))]
     }
 
     #[inline]
-    pub fn is_point_inside(&self, points: &[Point2], p: &Point2) -> bool
-    {
+    pub fn is_point_inside(&self, points: &[Point2], p: &Point2) -> bool {
         let v0 = self.c(points) - self.a(points);
         let v1 = self.b(points) - self.a(points);
         let v2 = p - self.a(points);
@@ -121,7 +123,7 @@ impl Triangle {
             for i in 0..self.v.len() {
                 if self.v[i] == *n2_index {
                     found = true;
-                    break
+                    break;
                 }
             }
 
@@ -156,7 +158,10 @@ impl Triangle {
             }
         }
 
-        panic!("get_neighbor_index invoked with indices not belonging to this element. n1: '{:?}' n2: '{:?}'", n1, n2);
+        panic!("get_neighbor_index invoked with indices not belonging to this element." +
+               " n1: '{:?}' n2: '{:?}'",
+               n1,
+               n2);
     }
 
     #[inline]
@@ -298,14 +303,20 @@ mod triangle {
         assert_eq!(true, tr.is_point_inside(&points, &Point2::new(0., 0.)));
 
         assert_eq!(false, tr.is_point_inside(&points, &Point2::new(0.5, 1.1)));
-        assert_eq!(false, tr.is_point_inside(&points, &Point2::new(-0.0000001, 0.)));
+        assert_eq!(false,
+                   tr.is_point_inside(&points, &Point2::new(-0.0000001, 0.)));
         assert_eq!(false, tr.is_point_inside(&points, &Point2::new(1.1, 1.1)));
         assert_eq!(false, tr.is_point_inside(&points, &Point2::new(-0.5, 0.5)));
     }
 
     #[test]
     fn get_neighbor_index() {
-        let points = vec![Point2::new(0., 0.), Point2::new(2., 2.), Point2::new(1., 0.), Point2::new(0., -1.), Point2::new(-1., 0.), Point2::new(2., 0.)];
+        let points = vec![Point2::new(0., 0.),
+                          Point2::new(2., 2.),
+                          Point2::new(1., 0.),
+                          Point2::new(0., -1.),
+                          Point2::new(-1., 0.),
+                          Point2::new(2., 0.)];
 
         let t0 = Triangle::new(&points, N2Index(0), N2Index(1), N2Index(2));
         assert_eq!(0, t0.get_neighbor_index(N2Index(0), N2Index(1)));

@@ -12,25 +12,28 @@ use super::tetrahedron_order::is_ordered_correctly;
 pub struct Tetrahedron {
     v: [N3Index; 4],
 
-    n: [Option<T4Index>; 4]
+    n: [Option<T4Index>; 4],
 }
 
 impl Tetrahedron {
     #[inline]
     pub fn new(points: &[Point3], a: N3Index, b: N3Index, c: N3Index, d: N3Index) -> Tetrahedron {
         if is_ordered_correctly(&points[a.0], &points[b.0], &points[c.0], &points[d.0]) {
-            Tetrahedron { v: [a, b, c, d], n: [None, None, None, None] }
+            Tetrahedron {
+                v: [a, b, c, d],
+                n: [None, None, None, None],
+            }
         } else {
-            Tetrahedron { v: [a, d, c, b], n: [None, None, None, None] }
+            Tetrahedron {
+                v: [a, d, c, b],
+                n: [None, None, None, None],
+            }
         }
     }
 
     #[inline]
     pub fn new_exact(v: [N3Index; 4], n: [Option<T4Index>; 4]) -> Tetrahedron {
-        Tetrahedron {
-            v: v,
-            n: n,
-        }
+        Tetrahedron { v: v, n: n }
     }
 
     #[inline]
@@ -80,22 +83,20 @@ impl Tetrahedron {
 
     #[inline]
     pub fn faces_as_indices_tuples(&self) -> [(N3Index, N3Index, N3Index); 4] {
-        [
-            (self.index_a(), self.index_b(), self.index_c()),
-            (self.index_b(), self.index_a(), self.index_d()),
-            (self.index_d(), self.index_c(), self.index_b()),
-            (self.index_d(), self.index_a(), self.index_c()),
-        ]
+        [(self.index_a(), self.index_b(), self.index_c()),
+         (self.index_b(), self.index_a(), self.index_d()),
+         (self.index_d(), self.index_c(), self.index_b()),
+         (self.index_d(), self.index_a(), self.index_c())]
     }
 
     #[inline]
-    pub fn faces_as_points_tuples<'a>(&self, points: &'a [Point3]) -> [(&'a Point3, &'a Point3, &'a Point3); 4] {
-        [
-            (self.a(points), self.b(points), self.c(points)),
-            (self.b(points), self.a(points), self.d(points)),
-            (self.d(points), self.c(points), self.b(points)),
-            (self.d(points), self.a(points), self.c(points))
-        ]
+    pub fn faces_as_points_tuples<'a>(&self,
+                                      points: &'a [Point3])
+                                      -> [(&'a Point3, &'a Point3, &'a Point3); 4] {
+        [(self.a(points), self.b(points), self.c(points)),
+         (self.b(points), self.a(points), self.d(points)),
+         (self.d(points), self.c(points), self.b(points)),
+         (self.d(points), self.a(points), self.c(points))]
     }
 
     #[inline]
@@ -106,7 +107,7 @@ impl Tetrahedron {
             for i in 0..self.v.len() {
                 if self.v[i] == *n3_index {
                     found = true;
-                    break
+                    break;
                 }
             }
 
@@ -128,16 +129,28 @@ impl Tetrahedron {
             let edge = self.faces_as_indices_tuples()[edge_index];
             let sorted_edge = sort_3(edge.0, edge.1, edge.2);
 
-            println!("sorted input {:?} sorted_edge {:?}", sorted_input, sorted_edge);
-            if sorted_edge.0 == sorted_input.0 && sorted_edge.1 == sorted_input.1 && sorted_edge.2 == sorted_input.2 {
+            println!("sorted input {:?} sorted_edge {:?}",
+                     sorted_input,
+                     sorted_edge);
+            if sorted_edge.0 == sorted_input.0 && sorted_edge.1 == sorted_input.1 &&
+               sorted_edge.2 == sorted_input.2 {
                 return edge_index;
             }
         }
-        panic!("get_neighbor_index invoked with indices not belonging to this element. n1: '{:?}' n2: '{:?}' n3: '{:?}' self.v '{:?}'", n1, n2, n3, self.v);
+        panic!("get_neighbor_index invoked with indices not belonging to this element. " +
+               "n1: '{:?}' n2: '{:?}' n3: '{:?}' self.v '{:?}'",
+               n1,
+               n2,
+               n3,
+               self.v);
     }
 
     #[inline]
-    pub fn get_neighbor_for_indices(&self, n1: N3Index, n2: N3Index, n3: N3Index) -> Option<T4Index> {
+    pub fn get_neighbor_for_indices(&self,
+                                    n1: N3Index,
+                                    n2: N3Index,
+                                    n3: N3Index)
+                                    -> Option<T4Index> {
         self.n[self.get_neighbor_index(n1, n2, n3)]
     }
 
@@ -158,7 +171,9 @@ impl Tetrahedron {
         let c = self.c(nodes);
         let d = self.d(nodes);
 
-        Point3::new((a.x + b.x + c.x + d.x) / 4., (a.y + b.y + c.y + d.y) / 4., (a.z + b.z + c.z + d.z) / 4.)
+        Point3::new((a.x + b.x + c.x + d.x) / 4.,
+                    (a.y + b.y + c.y + d.y) / 4.,
+                    (a.z + b.z + c.z + d.z) / 4.)
     }
 }
 
@@ -169,7 +184,10 @@ mod tests {
 
     #[test]
     fn points_are_put_in_clockwise_order() {
-        let points = vec![Point3::new(0., 0., 0.), Point3::new(100., 0., 0.), Point3::new(0., 100., 0.), Point3::new(0., 0., 100.)];
+        let points = vec![Point3::new(0., 0., 0.),
+                          Point3::new(100., 0., 0.),
+                          Point3::new(0., 100., 0.),
+                          Point3::new(0., 0., 100.)];
 
         let tr = Tetrahedron::new(&points, N3Index(0), N3Index(1), N3Index(2), N3Index(3));
 
@@ -178,7 +196,8 @@ mod tests {
         assert_eq!(*tr.c(&points), points[2]);
         assert_eq!(*tr.d(&points), points[1]);
 
-        let correctly_ordered = Tetrahedron::new(&points, N3Index(0), N3Index(3), N3Index(2), N3Index(1));
+        let correctly_ordered =
+            Tetrahedron::new(&points, N3Index(0), N3Index(3), N3Index(2), N3Index(1));
 
         assert_eq!(*correctly_ordered.a(&points), points[0]);
         assert_eq!(*correctly_ordered.b(&points), points[3]);
@@ -188,7 +207,10 @@ mod tests {
 
     #[test]
     fn get_neighbor_index_test() {
-        let points = vec![Point3::new(0., 0., 0.), Point3::new(100., 0., 0.), Point3::new(0., 100., 0.), Point3::new(0., 0., 100.)];
+        let points = vec![Point3::new(0., 0., 0.),
+                          Point3::new(100., 0., 0.),
+                          Point3::new(0., 100., 0.),
+                          Point3::new(0., 0., 100.)];
 
         let tr = Tetrahedron::new(&points, N3Index(0), N3Index(1), N3Index(2), N3Index(3));
 

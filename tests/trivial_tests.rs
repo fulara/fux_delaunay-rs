@@ -8,16 +8,23 @@ use rand::{SeedableRng, StdRng};
 
 #[test]
 fn trivial_tests_1() {
-    let mut triangulation = Triangulation2::new(&[Point2::new(0., 10.), Point2::new(10., 10.), Point2::new(0., 0.), Point2::new(10., 0.)]);
+    let mut triangulation = Triangulation2::new(&[Point2::new(0., 10.),
+                                                  Point2::new(10., 10.),
+                                                  Point2::new(0., 0.),
+                                                  Point2::new(10., 0.)]);
 
     triangulation.insert_node(&Point2::new(2., 2.));
 
-    abaqus_2d_write::write_2d_to_abaqus_format("tests/tests_results/trivial_tests_1.inp", &triangulation);
+    abaqus_2d_write::write_2d_to_abaqus_format("tests/tests_results/trivial_tests_1.inp",
+                                               &triangulation);
 }
 
 #[test]
 fn trivial_tests_2() {
-    let mut triangulation = Triangulation2::new(&[Point2::new(0., 10.), Point2::new(10., 10.), Point2::new(0., 0.), Point2::new(10., 0.)]);
+    let mut triangulation = Triangulation2::new(&[Point2::new(0., 10.),
+                                                  Point2::new(10., 10.),
+                                                  Point2::new(0., 0.),
+                                                  Point2::new(10., 0.)]);
 
     triangulation.insert_node(&Point2::new(0., 2.));
     triangulation.insert_node(&Point2::new(2., 2.));
@@ -28,12 +35,16 @@ fn trivial_tests_2() {
     triangulation.insert_node(&Point2::new(8., 8.));
     triangulation.insert_node(&Point2::new(10., 8.));
 
-    abaqus_2d_write::write_2d_to_abaqus_format("tests/tests_results/trivial_tests_2.inp", &triangulation);
+    abaqus_2d_write::write_2d_to_abaqus_format("tests/tests_results/trivial_tests_2.inp",
+                                               &triangulation);
 }
 
 #[test]
 fn trivial_tests_3() {
-    let mut triangulation = Triangulation2::new(&[Point2::new(0., 10.), Point2::new(10., 10.), Point2::new(0., 0.), Point2::new(10., 0.)]);
+    let mut triangulation = Triangulation2::new(&[Point2::new(0., 10.),
+                                                  Point2::new(10., 10.),
+                                                  Point2::new(0., 0.),
+                                                  Point2::new(10., 0.)]);
 
     triangulation.insert_node(&Point2::new(4., 4.));
     triangulation.insert_node(&Point2::new(6., 4.));
@@ -52,13 +63,17 @@ fn trivial_tests_3() {
     triangulation.insert_node(&Point2::new(5., 8.));
     triangulation.insert_node(&Point2::new(8., 8.));
 
-    abaqus_2d_write::write_2d_to_abaqus_format("tests/tests_results/trivial_tests_3.inp", &triangulation);
+    abaqus_2d_write::write_2d_to_abaqus_format("tests/tests_results/trivial_tests_3.inp",
+                                               &triangulation);
 }
 
 
 #[test]
 fn trivial_tests_4() {
-    let mut triangulation = Triangulation2::new(&[Point2::new(0., 10.), Point2::new(10., 10.), Point2::new(0., 0.), Point2::new(10., 0.)]);
+    let mut triangulation = Triangulation2::new(&[Point2::new(0., 10.),
+                                                  Point2::new(10., 10.),
+                                                  Point2::new(0., 0.),
+                                                  Point2::new(10., 0.)]);
 
     for x in 1..2500 {
         //for y in 1 .. 100 {
@@ -68,12 +83,16 @@ fn trivial_tests_4() {
         //}
     }
 
-    abaqus_2d_write::write_2d_to_abaqus_format("tests/tests_results/trivial_tests_4.inp", &triangulation);
+    abaqus_2d_write::write_2d_to_abaqus_format("tests/tests_results/trivial_tests_4.inp",
+                                               &triangulation);
 }
 
 #[test]
 fn trivial_tests_5() {
-    let mut triangulation = Triangulation2::new(&[Point2::new(0., 10.), Point2::new(10., 10.), Point2::new(0., 0.), Point2::new(10., 0.)]);
+    let mut triangulation = Triangulation2::new(&[Point2::new(0., 10.),
+                                                  Point2::new(10., 10.),
+                                                  Point2::new(0., 0.),
+                                                  Point2::new(10., 0.)]);
 
     let seed: &[_] = &[1];
     let mut rng: StdRng = SeedableRng::from_seed(seed);
@@ -85,5 +104,6 @@ fn trivial_tests_5() {
         triangulation.insert_node(&Point2::new(x, y));
     }
 
-    abaqus_2d_write::write_2d_to_abaqus_format("tests/tests_results/trivial_tests_5.inp", &triangulation);
+    abaqus_2d_write::write_2d_to_abaqus_format("tests/tests_results/trivial_tests_5.inp",
+                                               &triangulation);
 }

@@ -1,4 +1,4 @@
-use ::types::Point2;
+use types::Point2;
 
 #[derive(Clone, Eq, PartialEq, Debug)]
 pub enum PointLiesOnLineSide {

@@ -51,7 +51,9 @@ pub fn deserialize_data(path_to_data: &str) -> ::std::io::Result<Vec<CApiPoint2>
 }
 
 #[no_mangle]
-pub fn generate_triangulation(points: *mut CApiPoint2, point_count: libc::int32_t, triangulation_data: *mut CApiTriangulation) {
+pub fn generate_triangulation(points: *mut CApiPoint2,
+                              point_count: libc::int32_t,
+                              triangulation_data: *mut CApiTriangulation) {
     let points: &[CApiPoint2] = unsafe { from_raw_parts(points, point_count as usize) };
     serialize_and_save_data(&Vec::from(points));
 
@@ -65,9 +67,7 @@ pub fn generate_triangulation(points: *mut CApiPoint2, point_count: libc::int32_
     let mut elements: Vec<CApiElement3> = Vec::new();
 
     for e in triangulation.elements().into_iter() {
-        elements.push(CApiElement3 {
-            v: [e.index_a().0, e.index_b().0, e.index_c().0],
-        })
+        elements.push(CApiElement3 { v: [e.index_a().0, e.index_b().0, e.index_c().0] })
     }
 
     let element_count = elements.len();

@@ -1,4 +1,4 @@
-use ::types::Point3;
+use types::Point3;
 use cgmath::Matrix3;
 use cgmath::Matrix4;
 use cgmath::SquareMatrix;
@@ -48,17 +48,35 @@ pub fn circumsphere_side(p: &Point3, q: &Point3, r: &Point3, s: &Point3, t: &Poi
     let artz = rtz.abs();
     let astz = stz.abs();
 
-    if maxx < aqtx { maxx = aqtx };
-    if maxx < artx { maxx = artx };
-    if maxx < astx { maxx = astx };
+    if maxx < aqtx {
+        maxx = aqtx
+    };
+    if maxx < artx {
+        maxx = artx
+    };
+    if maxx < astx {
+        maxx = astx
+    };
 
-    if maxy < aqty { maxy = aqty };
-    if maxy < arty { maxy = arty };
-    if maxy < asty { maxy = asty };
+    if maxy < aqty {
+        maxy = aqty
+    };
+    if maxy < arty {
+        maxy = arty
+    };
+    if maxy < asty {
+        maxy = asty
+    };
 
-    if maxz < aqtz { maxz = aqtz };
-    if maxz < artz { maxz = artz };
-    if maxz < astz { maxz = astz };
+    if maxz < aqtz {
+        maxz = aqtz
+    };
+    if maxz < artz {
+        maxz = artz
+    };
+    if maxz < astz {
+        maxz = astz
+    };
 
     let mut eps = 1e-12 * maxx * maxy * maxz;
     if maxx > maxz {
@@ -70,22 +88,35 @@ pub fn circumsphere_side(p: &Point3, q: &Point3, r: &Point3, s: &Point3, t: &Poi
         ::std::mem::swap(&mut maxx, &mut maxy);
     }
 
-    let det = Matrix4::new(ptx, pty, ptz, pt2,
-                           rtx, rty, rtz, rt2,
-                           qtx, qty, qtz, qt2,
-                           stx, sty, stz, st2).determinant();
+    let det = Matrix4::new(ptx,
+                           pty,
+                           ptz,
+                           pt2,
+                           rtx,
+                           rty,
+                           rtz,
+                           rt2,
+                           qtx,
+                           qty,
+                           qtz,
+                           qt2,
+                           stx,
+                           sty,
+                           stz,
+                           st2)
+            .determinant();
 
     eps *= maxz * maxz;
     if det > eps {
-        return SphereSide::Inside
+        return SphereSide::Inside;
     }
-    return SphereSide::Outside
+    return SphereSide::Outside;
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use ::types::Point3;
+    use types::Point3;
 
     use cgmath::Rad;
     use cgmath::{Rotation, Rotation2, Rotation3, Basis3};
@@ -115,13 +146,13 @@ mod tests {
         let c = Point3::new(x + rotation_c.x, y + rotation_c.y, z + rotation_c.z);
         let d = Point3::new(x + rotation_d.x, y + rotation_d.y, z + rotation_d.z);
 
-        assert_eq! (SphereSide::Inside, circumsphere_side(&a, &b, &c, &d, &Point3::new(x, y, z)));
+        assert_eq!(SphereSide::Inside,
+                   circumsphere_side(&a, &b, &c, &d, &Point3::new(x, y, z)));
 
 
-        let rotations: [Basis3<f64>; 3] = [
-            Rotation3::from_angle_x(Rad(-f64::consts::PI / 50.)),
-            Rotation3::from_angle_y(Rad(-f64::consts::PI / 50.)),
-            Rotation3::from_angle_z(Rad(-f64::consts::PI / 50.))];
+        let rotations: [Basis3<f64>; 3] = [Rotation3::from_angle_x(Rad(-f64::consts::PI / 50.)),
+                                           Rotation3::from_angle_y(Rad(-f64::consts::PI / 50.)),
+                                           Rotation3::from_angle_z(Rad(-f64::consts::PI / 50.))];
 
         for i in 1..10 {
             let multiplier = 0.2 * i as f64;

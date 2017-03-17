@@ -8,7 +8,8 @@ mod neighborhood_test {
 
     #[test]
     fn load_trivial_and_check_neighborhood() {
-        let triangulation = load_2d_from_abaqus_format("tests/data/trivial.inp").expect("load_trivial_and_check_neighborhood file loading fail");
+        let triangulation = load_2d_from_abaqus_format("tests/data/trivial.inp")
+            .expect("load_trivial_and_check_neighborhood file loading fail");
 
         assert_eq!(560, triangulation.nodes().len());
         assert_eq!(814, triangulation.elements().len());
@@ -19,7 +20,11 @@ mod neighborhood_test {
             let center = e.create_center_point(triangulation.nodes());
 
 
-            assert_eq!(LocationResult::InElement(T3Index(i)), locate_element_containing(T3Index(0), triangulation.elements(), triangulation.nodes(), &center));
+            assert_eq!(LocationResult::InElement(T3Index(i)),
+                       locate_element_containing(T3Index(0),
+                                                 triangulation.elements(),
+                                                 triangulation.nodes(),
+                                                 &center));
         }
     }
 }

@@ -12,7 +12,11 @@ pub enum LocationResult {
 }
 
 #[inline]
-pub fn locate_element_containing(start_lookup_at : T3Index, elements: &Vec<Triangle>, nodes: &Vec<Point2>, p: &Point2) -> LocationResult {
+pub fn locate_element_containing(start_lookup_at: T3Index,
+                                 elements: &Vec<Triangle>,
+                                 nodes: &Vec<Point2>,
+                                 p: &Point2)
+                                 -> LocationResult {
     let mut ele_index = start_lookup_at;
 
     loop {
@@ -39,8 +43,8 @@ pub fn locate_element_containing(start_lookup_at : T3Index, elements: &Vec<Trian
                 }
                 math::PointLiesOnLineSide::OnLine => {
                     on_edge_found = Some(current_edge);
-                },
-                math::PointLiesOnLineSide::Right => ()
+                }
+                math::PointLiesOnLineSide::Right => (),
             }
             current_edge += 1;
         }
@@ -68,7 +72,10 @@ mod tests {
 
     #[test]
     fn locator_test() {
-        let pts = vec![Point2::new(0.0, 0.0), Point2::new(1.0, 0.0), Point2::new(0.0, 1.0), Point2::new(1.0, 1.0)];
+        let pts = vec![Point2::new(0.0, 0.0),
+                       Point2::new(1.0, 0.0),
+                       Point2::new(0.0, 1.0),
+                       Point2::new(1.0, 1.0)];
 
         let t0 = Triangle::new(&pts, N2Index(0), N2Index(1), N2Index(2));
         let t1 = Triangle::new(&pts, N2Index(1), N2Index(2), N2Index(3));
@@ -80,9 +87,21 @@ mod tests {
         let center0 = t0.create_center_point(&pts);
         let center1 = t1.create_center_point(&pts);
 
-        assert_eq! (LocationResult::InElement(T3Index(0)), locate_element_containing(T3Index(0),triangulation.elements(), triangulation.nodes(), &center0));
-        assert_eq!(LocationResult::InElement(T3Index(1)), locate_element_containing(T3Index(0),triangulation.elements(), triangulation.nodes(), &center1));
+        assert_eq!(LocationResult::InElement(T3Index(0)),
+                   locate_element_containing(T3Index(0),
+                                             triangulation.elements(),
+                                             triangulation.nodes(),
+                                             &center0));
+        assert_eq!(LocationResult::InElement(T3Index(1)),
+                   locate_element_containing(T3Index(0),
+                                             triangulation.elements(),
+                                             triangulation.nodes(),
+                                             &center1));
 
-        assert_eq! (LocationResult::OnEdge(T3Index(0), 2usize), locate_element_containing(T3Index(0),triangulation.elements(), triangulation.nodes(), &Point2::new(0.5, 0.)));
+        assert_eq!(LocationResult::OnEdge(T3Index(0), 2usize),
+                   locate_element_containing(T3Index(0),
+                                             triangulation.elements(),
+                                             triangulation.nodes(),
+                                             &Point2::new(0.5, 0.)));
     }
 }
