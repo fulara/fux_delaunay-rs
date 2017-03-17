@@ -158,8 +158,8 @@ impl Triangle {
             }
         }
 
-        panic!("get_neighbor_index invoked with indices not belonging to this element." +
-               " n1: '{:?}' n2: '{:?}'",
+        panic!("get_neighbor_index invoked with indices not belonging to this element. \
+               n1: '{:?}' n2: '{:?}'",
                n1,
                n2);
     }

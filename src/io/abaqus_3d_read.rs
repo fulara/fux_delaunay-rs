@@ -62,8 +62,8 @@ fn read_buff<R: Read>(reader: BufReader<R>) -> Result<Triangulation3, String> {
                             let split_line: Vec<_> = line.trim().split(',').collect();
 
                             if split_line.len() != 5 {
-                                return Err(format!("line '{}' is not valid for a element." +
-                                                   "Line has len of '{}'",
+                                return Err(format!("line '{}' is not valid for a element. \
+                                                   Line has len of '{}'",
                                                    line,
                                                    split_line.len()));
                             } else {
