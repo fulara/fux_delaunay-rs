@@ -125,6 +125,11 @@ impl Tetrahedron {
     }
 
     #[inline]
+    pub fn set_node(&mut self, node_index : usize, set_with : N3Index) {
+        self.v[node_index] = set_with;
+    }
+
+    #[inline]
     pub fn get_neighbor_index(&self, n1: N3Index, n2: N3Index, n3: N3Index) -> usize {
         //TODO this could all be eliminated if the elements and neighboring were ordered correctly,
         let sorted_input = sort_3(n1, n2, n3);

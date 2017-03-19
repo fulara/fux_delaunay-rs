@@ -20,69 +20,88 @@ pub fn insert_into_element(triangulation: &mut Triangulation3,
     };
 
     let cw1 = Tetrahedron::new(triangulation.nodes(),
-                               original_elements_faces[0].0,
-                               original_elements_faces[0].1,
-                               original_elements_faces[0].2,
-                               new_node_index);
-    assert_eq!(*cw1.nodes(),
-               [original_elements_faces[0].0,
-                original_elements_faces[0].1,
-                original_elements_faces[0].2,
-                new_node_index]);
-    let cw2 = Tetrahedron::new(triangulation.nodes(),
                                original_elements_faces[1].0,
                                original_elements_faces[1].1,
                                original_elements_faces[1].2,
                                new_node_index);
-    assert_eq!(*cw2.nodes(),
+    assert_eq!(*cw1.nodes(),
                [original_elements_faces[1].0,
                 original_elements_faces[1].1,
                 original_elements_faces[1].2,
                 new_node_index]);
-    let cw3 = Tetrahedron::new(triangulation.nodes(),
+    let cw2 = Tetrahedron::new(triangulation.nodes(),
                                original_elements_faces[2].0,
                                original_elements_faces[2].1,
                                original_elements_faces[2].2,
                                new_node_index);
-    assert_eq!(*cw3.nodes(),
+    assert_eq!(*cw2.nodes(),
                [original_elements_faces[2].0,
                 original_elements_faces[2].1,
                 original_elements_faces[2].2,
                 new_node_index]);
+    let cw3 = Tetrahedron::new(triangulation.nodes(),
+                               original_elements_faces[3].0,
+                               original_elements_faces[3].1,
+                               original_elements_faces[3].2,
+                               new_node_index);
+    assert_eq!(*cw3.nodes(),
+               [original_elements_faces[3].0,
+                original_elements_faces[3].1,
+                original_elements_faces[3].2,
+                new_node_index]);
 
-    update_neighborhood(triangulation,
-                        original_element_neighbors[0],
-                        original_elements_faces[0],
-                        index_of_cw1);
     update_neighborhood(triangulation,
                         original_element_neighbors[1],
                         original_elements_faces[1],
-                        index_of_cw2);
-
+                        index_of_cw1);
     update_neighborhood(triangulation,
                         original_element_neighbors[2],
                         original_elements_faces[2],
+                        index_of_cw2);
+
+    update_neighborhood(triangulation,
+                        original_element_neighbors[3],
+                        original_elements_faces[3],
                         index_of_cw3);
 
     triangulation.elements_mut().push(cw1);
     triangulation.elements_mut().push(cw2);
     triangulation.elements_mut().push(cw3);
 
-    /*    set_neighbors(&mut triangulation.elements_mut()[index_of_left.0],
-                  [original_element_neighbors[0], Some(index_of_top), Some(index_of_right)]);
-    set_neighbors(&mut triangulation.elements_mut()[index_of_top.0],
-                  [original_element_neighbors[1], Some(index_of_right), Some(index_of_left)]);
+    set_neighbors(&mut triangulation.elements_mut()[index_of_bottom.0],
+                  [original_element_neighbors[0],
+                   Some(index_of_cw1),
+                   Some(index_of_cw2),
+                   Some(index_of_cw3)]);
 
-    //updated original element. first update neighbors.
-    let original_element: &mut Triangle = &mut triangulation.elements_mut()[index_of_right.0];
-    set_neighbors(original_element,
-                  [original_element_neighbors[2], Some(index_of_left), Some(index_of_top)]);
+    //override D with E in original element.
+    triangulation.elements_mut()[index_of_bottom.0].set_node(3, new_node_index);
 
-    original_element.update_nodes(original_elements_nodes[2],
-                                  original_elements_nodes[0],
-                                  new_node_index);
-*/
+    set_neighbors(&mut triangulation.elements_mut()[index_of_cw1.0],
+                  [original_element_neighbors[1],
+                   Some(index_of_bottom),
+                   Some(index_of_cw3),
+                   Some(index_of_cw2)]);
+
+    set_neighbors(&mut triangulation.elements_mut()[index_of_cw2.0],
+                  [original_element_neighbors[2],
+                   Some(index_of_cw3),
+                   Some(index_of_bottom),
+                   Some(index_of_cw2)]);
+
+    set_neighbors(&mut triangulation.elements_mut()[index_of_cw3.0],
+                  [original_element_neighbors[3],
+                   Some(index_of_cw1),
+                   Some(index_of_bottom),
+                   Some(index_of_cw2)]);
+
     (index_of_bottom, index_of_cw1, index_of_cw2, index_of_cw3)
+}
+
+fn set_neighbors(element: &mut Tetrahedron, n: [Option<T4Index>; 4]) {
+    for i in 0..4 {
+        element.set_neighbor(i, n[i])
+    }
 }
 
 fn update_neighborhood(triangulation: &mut Triangulation3,
@@ -101,6 +120,8 @@ mod tests {
     use types::*;
     use algorithms3::element_locators::*;
     use super::*;
+    use types::triangulation3_test_utils::get_example_initial_point_set;
+    use types::triangulation3_initiation::create_initial_tetra_set;
 
     #[test]
     fn insert_into_single_element() {
@@ -121,14 +142,54 @@ mod tests {
         insert_into_element(&mut tr, T4Index(0), N3Index(4));
 
         assert_eq!(4, tr.elements().len());
-        /*assert_eq!(Triangle::new_exact([N2Index(0), N2Index(2), N2Index(6)],
-                                       [Some(T3Index(3)), Some(T3Index(5)), Some(T3Index(0))]),
-                   tr.elements()[4]);
-        assert_eq!(Triangle::new_exact([N2Index(2), N2Index(1), N2Index(6)],
-                                       [Some(T3Index(2)), Some(T3Index(0)), Some(T3Index(4))]),
-                   tr.elements()[5]);
-        assert_eq!(Triangle::new_exact([N2Index(1), N2Index(0), N2Index(6)],
-                                       [Some(T3Index(1)), Some(T3Index(4)), Some(T3Index(5))]),
-                   tr.elements()[0]); */
+        assert_eq!(Tetrahedron::new_exact([N3Index(0), N3Index(1), N3Index(2), N3Index(4)],
+                                          [None,
+                                           Some(T4Index(1)),
+                                           Some(T4Index(2)),
+                                           Some(T4Index(3))]),
+                   tr.elements()[0]);
+        assert_eq!(Tetrahedron::new_exact([N3Index(1), N3Index(0), N3Index(3), N3Index(4)],
+                                          [None,
+                                           Some(T4Index(0)),
+                                           Some(T4Index(3)),
+                                           Some(T4Index(2))]),
+                   tr.elements()[1]);
+        assert_eq!(Tetrahedron::new_exact([N3Index(3), N3Index(2), N3Index(1), N3Index(4)],
+                                          [None,
+                                           Some(T4Index(3)),
+                                           Some(T4Index(0)),
+                                           Some(T4Index(2))]),
+                   tr.elements()[2]);
+        assert_eq!(Tetrahedron::new_exact([N3Index(3), N3Index(0), N3Index(2), N3Index(4)],
+                                          [None,
+                                           Some(T4Index(1)),
+                                           Some(T4Index(0)),
+                                           Some(T4Index(2))]),
+                   tr.elements()[3]);
+    }
+
+    #[test]
+    fn testing_using_example_initial_point_set() {
+        let nodes: Vec<Point3> = get_example_initial_point_set();
+        let eles: Vec<Tetrahedron> = create_initial_tetra_set(&nodes);
+
+        for index in 0..eles.len() {
+            let element_to_which_insert = eles[index].clone();
+            let center = element_to_which_insert.create_center_point(&nodes);
+
+            let mut nodes = nodes.clone();
+            let mut eles = eles.clone();
+
+            nodes.push(center);
+
+            let mut tr = Triangulation3::new_from_prebuilt_triangulation(nodes.clone(),
+                                                                         eles.clone());
+
+            insert_into_element(&mut tr, T4Index(index), N3Index(nodes.len() - 1));
+
+        }
+
+
+
     }
 }
