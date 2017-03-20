@@ -54,11 +54,12 @@ impl<'a, W: Write> AbaqusWriter<'a, W> {
         for i in 0..self.triangulation.elements().len() {
             let element = &self.triangulation.elements()[i];
             //abaqus uses ccw order instead of cw, writing nodes in order [cab] is required.
+            //also the first three nodes have to be in separate order as its used in this lib
             let _ = self.writer.write(format!("{},\t{},\t{},\t{},\t{}\n",
                                               i + 1,
                                               element.index_d().0 + 1,
-                                              element.index_c().0 + 1,
                                               element.index_b().0 + 1,
+                                              element.index_c().0 + 1,
                                               element.index_a().0 + 1)
                                               .as_bytes());
         }
