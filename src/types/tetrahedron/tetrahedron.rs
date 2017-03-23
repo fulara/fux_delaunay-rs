@@ -125,7 +125,7 @@ impl Tetrahedron {
     }
 
     #[inline]
-    pub fn set_node(&mut self, node_index : usize, set_with : N3Index) {
+    pub fn set_node(&mut self, node_index: usize, set_with: N3Index) {
         self.v[node_index] = set_with;
     }
 
@@ -189,6 +189,22 @@ impl Tetrahedron {
         Point3::new((a.x + b.x + c.x + d.x) / 4.,
                     (a.y + b.y + c.y + d.y) / 4.,
                     (a.z + b.z + c.z + d.z) / 4.)
+    }
+
+    #[inline]
+    pub fn is_point_in_circumsphere(&self, p: &Point3, pts: &[Point3]) -> SphereSide {
+        circumsphere_side(self.a(pts), self.b(pts), self.c(pts), self.d(pts), p)
+    }
+
+    #[inline]
+    pub fn is_point_outside(&self, p: &Point3, pts: &[Point3]) -> bool {
+        for face in self.faces_as_points_tuples(pts).iter() {
+            if side_of_plane(face.0, face.1, face.2, p) == SideOfPlane::Left {
+                return true;
+            }
+        }
+
+        false
     }
 }
 

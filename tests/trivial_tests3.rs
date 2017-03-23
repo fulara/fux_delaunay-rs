@@ -15,6 +15,5 @@ fn trivial_test3_1() {
 
     tr.insert_node(&to_insert);
 
-    write_3d_to_abaqus_format("tests/tests_results3/trivial_tests3_1.inp",
-                                               &tr);
+    write_3d_to_abaqus_format("tests/tests_results3/trivial_tests3_1.inp", &tr);
 }

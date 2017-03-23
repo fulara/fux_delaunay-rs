@@ -11,4 +11,5 @@ pub use self::order_float::*;
 pub use self::side_of_line::*;
 pub use self::circumcircle_side::*;
 
+pub use self::circumsphere_side::*;
 pub use self::side_of_plane::*;
