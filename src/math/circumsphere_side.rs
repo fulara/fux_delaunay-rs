@@ -5,9 +5,6 @@ use cgmath::SquareMatrix;
 use std::mem;
 use types::fp;
 
-use types::Point3Err;
-use types::point3_err_from_point3;
-
 #[derive(Eq, PartialEq, Debug, Copy, Clone)]
 pub enum SphereSide {
     Inside,
@@ -15,12 +12,6 @@ pub enum SphereSide {
 }
 
 pub fn circumsphere_side(p: &Point3, q: &Point3, r: &Point3, s: &Point3, t: &Point3) -> SphereSide {
-    let p = point3_err_from_point3(&p);
-    let q = point3_err_from_point3(&q);
-    let r = point3_err_from_point3(&r);
-    let s = point3_err_from_point3(&s);
-    let t = point3_err_from_point3(&t);
-
     let ptx = p.x - t.x;
     let pty = p.y - t.y;
     let ptz = p.z - t.z;
@@ -41,6 +32,62 @@ pub fn circumsphere_side(p: &Point3, q: &Point3, r: &Point3, s: &Point3, t: &Poi
     let stz = s.z - t.z;
     let st2 = stx * stx + sty * sty + stz * stz;
 
+    let mut maxx = ptx.abs();
+    let mut maxy = pty.abs();
+    let mut maxz = ptz.abs();
+
+    let aqtx = qtx.abs();
+    let artx = rtx.abs();
+    let astx = stx.abs();
+
+    let aqty = qty.abs();
+    let arty = rty.abs();
+    let asty = sty.abs();
+
+    let aqtz = qtz.abs();
+    let artz = rtz.abs();
+    let astz = stz.abs();
+
+    if maxx < aqtx {
+        maxx = aqtx
+    };
+    if maxx < artx {
+        maxx = artx
+    };
+    if maxx < astx {
+        maxx = astx
+    };
+
+    if maxy < aqty {
+        maxy = aqty
+    };
+    if maxy < arty {
+        maxy = arty
+    };
+    if maxy < asty {
+        maxy = asty
+    };
+
+    if maxz < aqtz {
+        maxz = aqtz
+    };
+    if maxz < artz {
+        maxz = artz
+    };
+    if maxz < astz {
+        maxz = astz
+    };
+
+    let mut eps = 1e-12 * maxx * maxy * maxz;
+    if maxx > maxz {
+        ::std::mem::swap(&mut maxx, &mut maxz);
+    }
+    if maxy > maxz {
+        ::std::mem::swap(&mut maxy, &mut maxz);
+    } else if maxy < maxx {
+        ::std::mem::swap(&mut maxx, &mut maxy);
+    }
+
     let det = Matrix4::new(ptx,
                            pty,
                            ptz,
@@ -59,9 +106,10 @@ pub fn circumsphere_side(p: &Point3, q: &Point3, r: &Point3, s: &Point3, t: &Poi
                            st2)
             .determinant();
 
-    let eps = det.err_times_eps();
+    println!("det is: {:?}", det);
 
-    if det.val() > eps {
+    eps *= maxz * maxz;
+    if det > eps {
         return SphereSide::Inside;
     }
     return SphereSide::Outside;
@@ -110,6 +158,7 @@ mod circumsphere_side {
     #[test]
     fn quick_check_error_case() {
         quick_check_test_impl(0., 0., 1., 86.4520368353185);
+        quick_check_test_impl(0., 0., 1., 46.27116838241295);
     }
 
     fn quick_check_test_impl(x: f64, y: f64, z: f64, r: f64) {
@@ -128,6 +177,9 @@ mod circumsphere_side {
         let b = Point3::new(x + rotation_b.x, y + rotation_b.y, z + rotation_b.z);
         let c = Point3::new(x + rotation_c.x, y + rotation_c.y, z + rotation_c.z);
         let d = Point3::new(x + rotation_d.x, y + rotation_d.y, z + rotation_d.z);
+        let nodes = [a, b, c, d];
+
+        let tetra = Tetrahedron::new(&nodes, N3Index(0), N3Index(1), N3Index(2), N3Index(3));
 
         assert_eq!(SphereSide::Inside,
                    circumsphere_side(&a, &b, &c, &d, &Point3::new(x, y, z)));
@@ -151,17 +203,32 @@ mod circumsphere_side {
 
                     let side = circumsphere_side(&a, &b, &c, &d, &tested_point);
 
-                    let expected = if multiplier < 0.99 { side } else { side };
+                    let expected = if multiplier <= 0.9 {
+                        SphereSide::Inside
+                    } else {
+                        SphereSide::Outside
+                    };
 
                     if side != expected {
-                        panic!("Failure. \
-                        Expected {:?}, a'{:?}', b'{:?}', c'{:?}', d'{:?}', test'{:?}'",
+                        panic!("Failure at Multiplier {:?}. \
+                        Expected {:?} got {:?}, a'{:?}', b'{:?}', c'{:?}', d'{:?}', test'{:?}'",
+                               multiplier,
                                expected,
+                               side,
                                a,
                                b,
                                c,
                                d,
                                tested_point);
+                    }
+
+                    match expected {
+                        SphereSide::Inside => {
+                            assert!(tetra.is_point_in_circumsphere(&tested_point, &nodes))
+                        }
+                        SphereSide::Outside => {
+                            assert!(!tetra.is_point_in_circumsphere(&tested_point, &nodes))
+                        }
                     }
                 }
             }
