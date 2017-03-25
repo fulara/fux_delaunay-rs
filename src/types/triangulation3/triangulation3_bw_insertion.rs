@@ -14,7 +14,7 @@ pub fn insert_into_element(triangulation: &mut Triangulation3,
     //let elements_to_remove;
 }
 
-fn find(tr: &Triangulation3, starting_element: T4Index, node: &Point3) {
+fn find(tr: &Triangulation3, starting_element: T4Index, node: &Point3) -> Vec<T4Index> {
     assert!(tr.elements()[starting_element.0].is_point_in_circumsphere(node, tr.nodes()));
 
     let mut checked_elements = HashSet::new();
@@ -50,6 +50,8 @@ fn find(tr: &Triangulation3, starting_element: T4Index, node: &Point3) {
             break;
         }
     }
+
+    elements_containing_point_in_circum
 }
 
 #[cfg(test)]
@@ -70,7 +72,7 @@ mod bw_insertion {
         for (index, tetra) in example_tr.iter().enumerate() {
             let tetra: &Tetrahedron = tetra;
             let center = tetra.create_center_point(&example_set);
-            find(&tr, T4Index(index), &center)
+            assert_eq!(find(&tr, T4Index(index), &center).len(), 5);
         }
     }
 }

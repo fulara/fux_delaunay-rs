@@ -137,8 +137,6 @@ mod circumsphere_side {
         let center = Point3::new(0.25, 0.25, 0.25);
         let tetra = Tetrahedron::new(&nodes, N3Index(0), N3Index(1), N3Index(2), N3Index(3));
 
-        println!("tetra {:?}", tetra);
-
         assert_eq!(circumsphere_side(&nodes[0], &nodes[1], &nodes[2], &nodes[3], &center),
                    SphereSide::Inside);
         assert!(tetra.is_point_in_circumsphere(&center, &nodes));
