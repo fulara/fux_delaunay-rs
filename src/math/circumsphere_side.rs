@@ -106,6 +106,8 @@ pub fn circumsphere_side(p: &Point3, q: &Point3, r: &Point3, s: &Point3, t: &Poi
                            st2)
             .determinant();
 
+    println!("det is: {:?}", det);
+
     eps *= maxz * maxz;
     if det > eps {
         return SphereSide::Inside;
@@ -114,7 +116,7 @@ pub fn circumsphere_side(p: &Point3, q: &Point3, r: &Point3, s: &Point3, t: &Poi
 }
 
 #[cfg(test)]
-mod tests {
+mod circumsphere_side {
     use super::*;
     use types::Point3;
 
@@ -123,6 +125,24 @@ mod tests {
     use std::f64;
 
     type Vector3 = ::cgmath::Vector3<f64>;
+    use types::Tetrahedron;
+    use types::N3Index;
+
+    #[test]
+    fn simple_example_test() {
+        let nodes = vec![Point3::new(0., 0., 0.),
+                         Point3::new(1., 0., 0.),
+                         Point3::new(0., 1., 0.),
+                         Point3::new(0., 0., 1.)];
+        let center = Point3::new(0.25, 0.25, 0.25);
+        let tetra = Tetrahedron::new(&nodes, N3Index(0), N3Index(1), N3Index(2), N3Index(3));
+
+        println!("tetra {:?}", tetra);
+
+        assert_eq!(circumsphere_side(&nodes[0], &nodes[1], &nodes[2], &nodes[3], &center),
+                   SphereSide::Inside);
+        assert!(tetra.is_point_in_circumsphere(&center, &nodes));
+    }
 
     #[quickcheck]
     fn quick_check_test(x: f64, y: f64, z: f64, r: f64) {

@@ -132,8 +132,8 @@ mod tests {
 4,	0,	0,	100
 5,	0,	0,	-100
 *Element, type=C3D4
-1,	2,	3,	4,	1
-2,	5,	3,	2,	1
+1,	2,	4,	3,	1
+2,	5,	2,	3,	1
 *Elset, elset=M_1
 1,2
 *Solid Section, elset=M_1, material=M_1

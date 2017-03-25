@@ -54,6 +54,23 @@ fn find(tr: &Triangulation3, starting_element: T4Index, node: &Point3) {
 
 #[cfg(test)]
 mod bw_insertion {
+    use super::*;
+
+    use super::super::triangulation3_test_utils::get_example_initial_point_set;
+    use super::super::triangulation3_initiation::create_initial_tetra_set;
+
+    use types::*;
     #[test]
-    fn tests() {}
+    fn testing_find_using_example_set() {
+        let example_set = get_example_initial_point_set();
+        let example_tr = create_initial_tetra_set(&example_set);
+        let tr = Triangulation3::new_from_prebuilt_triangulation(example_set.clone(),
+                                                                 example_tr.clone());
+
+        for (index, tetra) in example_tr.iter().enumerate() {
+            let tetra: &Tetrahedron = tetra;
+            let center = tetra.create_center_point(&example_set);
+            find(&tr, T4Index(index), &center)
+        }
+    }
 }

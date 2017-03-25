@@ -193,7 +193,8 @@ impl Tetrahedron {
 
     #[inline]
     pub fn is_point_in_circumsphere(&self, p: &Point3, pts: &[Point3]) -> bool {
-        circumsphere_side(self.a(pts), self.b(pts), self.c(pts), self.d(pts), p) ==
+        //todo: investigate why this requires different order.
+        circumsphere_side(self.a(pts), self.d(pts), self.c(pts), self.b(pts), p) ==
         SphereSide::Inside
     }
 
