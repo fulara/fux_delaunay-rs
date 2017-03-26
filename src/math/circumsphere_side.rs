@@ -11,6 +11,7 @@ pub enum SphereSide {
     Outside,
 }
 
+//todo rewrite this.
 pub fn circumsphere_side(p: &Point3, q: &Point3, r: &Point3, s: &Point3, t: &Point3) -> SphereSide {
     let ptx = p.x - t.x;
     let pty = p.y - t.y;
@@ -106,7 +107,13 @@ pub fn circumsphere_side(p: &Point3, q: &Point3, r: &Point3, s: &Point3, t: &Poi
                            st2)
             .determinant();
 
-    println!("det is: {:?}", det);
+    println!("det is: {:?} p: {:?} q: {:?} r: {:?} s: {:?} t: {:?}",
+             det,
+             p,
+             q,
+             r,
+             s,
+             t);
 
     eps *= maxz * maxz;
     if det > eps {
@@ -125,6 +132,7 @@ mod circumsphere_side {
     use std::f64;
 
     type Vector3 = ::cgmath::Vector3<f64>;
+
     use types::Tetrahedron;
     use types::N3Index;
 
