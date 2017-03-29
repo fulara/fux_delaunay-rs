@@ -3,16 +3,49 @@ use types::T4Index;
 use types::N3Index;
 use types::Tetrahedron;
 use types::Point3;
+use types::triangulation3::triangulation3_neighborhood::Triangulation3Neighborhood;
 use math::SphereSide;
 use algorithms3::sort_3::sort_3;
 
 use std::collections::HashMap;
 use std::collections::HashSet;
 
-pub fn insert_into_element(triangulation: &mut Triangulation3,
+pub fn insert_into_element_bw(triangulation: &mut Triangulation3,
                            element_index: T4Index,
                            new_node_index: N3Index) {
-    //let elements_to_remove;
+    let elements_to_remove = find(triangulation,
+                                  element_index,
+                                  &triangulation.nodes()[new_node_index.0]);
+    let faces_with_neighbors = select_faces_which_exist_only_once(triangulation,
+                                                                  &elements_to_remove);
+
+    assert!(faces_with_neighbors.len() >= elements_to_remove.len());
+
+    let mut new_tetras = Vec::new();
+
+    for (index, &((n1, n2, n3), neighbor)) in faces_with_neighbors.iter().enumerate() {
+        let mut new_tetra = Tetrahedron::new(triangulation.nodes(), n1, n2, n3, new_node_index);
+
+        if let Some(neighbor) = neighbor {
+            let neigh_index = new_tetra.get_neighbor_index(n1, n2, n3);
+            new_tetra.set_neighbor(neigh_index, Some(neighbor));
+        }
+
+        new_tetras.push(new_tetra);
+    }
+
+    Triangulation3Neighborhood::teach_triangles_of_neighborhood(&mut new_tetras);
+
+    let mut index = 0;
+    for original_element_index in elements_to_remove {
+        triangulation.elements_mut()[original_element_index.0] = new_tetras[index].clone();
+        index += 1;
+    }
+
+    for index in index..new_tetras.len() {
+        triangulation.elements_mut().push(new_tetras[index].clone());
+    }
+
 }
 
 fn find(tr: &Triangulation3, starting_element: T4Index, node: &Point3) -> Vec<T4Index> {
@@ -57,22 +90,22 @@ fn find(tr: &Triangulation3, starting_element: T4Index, node: &Point3) -> Vec<T4
 
 fn select_faces_which_exist_only_once(tr: &Triangulation3,
                                       indices: &[T4Index])
-                                      -> Vec<(N3Index, N3Index, N3Index)> {
+                                      -> Vec<((N3Index, N3Index, N3Index), Option<T4Index>)> {
     let mut face_counter = HashMap::new();
 
     for index in indices {
         let tetra: &Tetrahedron = &tr.elements()[index.0];
 
-        for face in tetra.faces_as_indices_tuples().iter() {
-            *face_counter.entry(sort_3(face.0, face.1, face.2)).or_insert(0) += 1;
+        for (index, face) in tetra.faces_as_indices_tuples().iter().enumerate() {
+            let mut entry = &mut (*face_counter.entry(sort_3(face.0, face.1, face.2))
+                                       .or_insert((tetra.get_neighbor_from_index(index), 0)));
+            (*entry).1 += 1;
         }
     }
 
-    println!("face counter: {:?}", face_counter);
-
     face_counter.iter()
-        .filter(|&(k, v)| *v == 1)
-        .map(|(k, v)| *k)
+        .filter(|&(k, v)| (*v).1 == 1)
+        .map(|(k, v)| (*k, v.0))
         .collect::<Vec<_>>()
 }
 

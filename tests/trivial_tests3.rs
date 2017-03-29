@@ -11,9 +11,10 @@ fn trivial_test3_1() {
 
     let mut tr = Triangulation3::new_from_prebuilt_triangulation(nodes.clone(), eles.clone());
 
-    let to_insert = tr.elements()[0].create_center_point(&nodes);
-
-    tr.insert_node(&to_insert);
+    for i in 0..5 {
+        let to_insert = tr.elements()[i].create_center_point(tr.nodes());
+        tr.insert_node(&to_insert);
+    }
 
     write_3d_to_abaqus_format("tests/tests_results3/trivial_tests3_1.inp", &tr);
 }

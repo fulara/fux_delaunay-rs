@@ -39,7 +39,7 @@ impl TriangulationNeighborhood {
         None
     }
 
-    pub fn teach_triangles_of_neighborhood(elements: &mut Vec<Triangle>) {
+    pub fn teach_triangles_of_neighborhood(elements: &mut [Triangle]) {
         let mut neighborhood = TriangulationNeighborhood::new();
         for i in 0..elements.len() {
             let e = &elements[i];

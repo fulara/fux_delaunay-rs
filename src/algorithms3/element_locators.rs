@@ -29,6 +29,7 @@ pub fn locate_element_containing(start_lookup_at: T4Index,
         let mut on_faces_found: Option<(usize, usize)> = None;
 
         loop {
+            println!("am i cycling here? {:?} ele_index {:?}", current_face, ele_index);
             if current_face == 4 {
                 break;
             }

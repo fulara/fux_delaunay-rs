@@ -4,6 +4,7 @@ use types::N3Index;
 use types::T4Index;
 use algorithms3::element_locators::*;
 use super::triangulation3_insertion;
+use super::triangulation3_bw_insertion;
 
 use super::triangulation3_neighborhood::Triangulation3Neighborhood;
 
@@ -48,6 +49,9 @@ impl Triangulation3 {
         self.nodes.push(*p);
         let new_node_index = N3Index(self.nodes.len() - 1);
 
+        println!("new node index is: {:?} {:?} len now is:",
+                 new_node_index,
+                 self.nodes.len());
         self.insert_into_triangulation(new_node_index);
     }
 
@@ -61,8 +65,11 @@ impl Triangulation3 {
         match location_result {
             LocationResult::InElement(ele_index) => {
                 self.last_added_element_index = ele_index;
-                let (t1_index, t2_index, t3_index, t4_index) =
-                    triangulation3_insertion::insert_into_element(self, ele_index, new_node_index);
+                triangulation3_bw_insertion::insert_into_element_bw(self,
+                                                                    ele_index,
+                                                                    new_node_index);
+                //let (t1_index, t2_index, t3_index, t4_index) =
+                //triangulation3_insertion::insert_into_element(self, ele_index, new_node_index);
                 //lawson_flipping::propagating_flip(self, new_node_index, t1_index);
                 //lawson_flipping::propagating_flip(self, new_node_index, t2_index);
                 //lawson_flipping::propagating_flip(self, new_node_index, t3_index);
