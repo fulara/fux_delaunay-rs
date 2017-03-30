@@ -39,7 +39,7 @@ pub fn locate_element_containing(start_lookup_at: T4Index,
             match math::side_of_plane(edge.0, edge.1, edge.2, p) {
                 math::SideOfPlane::Left => {
                     assert!(ele.get_neighbor_from_index(current_face).is_some());
-
+                    println!("skipping to {:?} from {:?}. jumping from {:?} to {:?}", ele.faces_as_indices_tuples()[current_face], ele, ele_index.0, ele.get_neighbor_from_index(current_face).unwrap());
                     ele_index = ele.get_neighbor_from_index(current_face).unwrap();
                     break;
                 }

@@ -7,12 +7,56 @@ use types::triangulation3::triangulation3_neighborhood::Triangulation3Neighborho
 use math::SphereSide;
 use algorithms3::sort_3::sort_3;
 
-use std::collections::HashMap;
-use std::collections::HashSet;
+use std::collections::BTreeMap;
+use std::collections::BTreeSet;
+
+struct BwNeighborTeacher {
+    neighbor_map: BTreeMap<(N3Index, N3Index, N3Index), T4Index>,
+}
+
+impl BwNeighborTeacher {
+    fn new() -> BwNeighborTeacher {
+        BwNeighborTeacher { neighbor_map: BTreeMap::new() }
+    }
+
+    fn add_and_teach(&mut self, triangulation: &mut Triangulation3, index: T4Index) {
+        let indices = triangulation.elements()[index.0].faces_as_indices_tuples();
+        for &(n1, n2, n3) in indices.into_iter() {
+            let sorted = sort_3(n1, n2, n3);
+
+            let mut found = None;
+            let mut should_insert = false;
+
+            if let Some(val) = self.neighbor_map.get(&sorted) {
+                if *val != index {
+                    found = Some(*val);
+                }
+            } else {
+                should_insert = true;
+            }
+
+            if should_insert {
+                self.neighbor_map.insert(sorted, index);
+            }
+
+            if let Some(found) = found {
+                {
+                    let ele: &mut Tetrahedron = &mut triangulation.elements_mut()[found.0];
+                    ele.update_neighbor(n1, n2, n3, Some(index));
+                }
+
+                {
+                    let ele: &mut Tetrahedron = &mut triangulation.elements_mut()[index.0];
+                    ele.update_neighbor(n1, n2, n3, Some(found));
+                }
+            }
+        }
+    }
+}
 
 pub fn insert_into_element_bw(triangulation: &mut Triangulation3,
-                           element_index: T4Index,
-                           new_node_index: N3Index) {
+                              element_index: T4Index,
+                              new_node_index: N3Index) {
     let elements_to_remove = find(triangulation,
                                   element_index,
                                   &triangulation.nodes()[new_node_index.0]);
@@ -22,36 +66,41 @@ pub fn insert_into_element_bw(triangulation: &mut Triangulation3,
     assert!(faces_with_neighbors.len() >= elements_to_remove.len());
 
     let mut new_tetras = Vec::new();
+    let mut tetras_which_have_to_be_teached = Vec::new();
+    let mut neighbor_teacher = BwNeighborTeacher::new();
 
     for (index, &((n1, n2, n3), neighbor)) in faces_with_neighbors.iter().enumerate() {
         let mut new_tetra = Tetrahedron::new(triangulation.nodes(), n1, n2, n3, new_node_index);
 
         if let Some(neighbor) = neighbor {
-            let neigh_index = new_tetra.get_neighbor_index(n1, n2, n3);
-            new_tetra.set_neighbor(neigh_index, Some(neighbor));
+            tetras_which_have_to_be_teached.push(neighbor);
         }
 
         new_tetras.push(new_tetra);
     }
 
-    Triangulation3Neighborhood::teach_triangles_of_neighborhood(&mut new_tetras);
-
     let mut index = 0;
     for original_element_index in elements_to_remove {
         triangulation.elements_mut()[original_element_index.0] = new_tetras[index].clone();
         index += 1;
+
+        tetras_which_have_to_be_teached.push(original_element_index);
     }
 
     for index in index..new_tetras.len() {
+        tetras_which_have_to_be_teached.push(T4Index(triangulation.elements().len()));
         triangulation.elements_mut().push(new_tetras[index].clone());
     }
 
+    for index in tetras_which_have_to_be_teached {
+        neighbor_teacher.add_and_teach(triangulation, index);
+    }
 }
 
 fn find(tr: &Triangulation3, starting_element: T4Index, node: &Point3) -> Vec<T4Index> {
     assert!(tr.elements()[starting_element.0].is_point_in_circumsphere(node, tr.nodes()));
 
-    let mut checked_elements = HashSet::new();
+    let mut checked_elements = BTreeSet::new();
     let mut elements_to_check = Vec::new();
     let mut elements_containing_point_in_circum = Vec::new();
 
@@ -91,7 +140,7 @@ fn find(tr: &Triangulation3, starting_element: T4Index, node: &Point3) -> Vec<T4
 fn select_faces_which_exist_only_once(tr: &Triangulation3,
                                       indices: &[T4Index])
                                       -> Vec<((N3Index, N3Index, N3Index), Option<T4Index>)> {
-    let mut face_counter = HashMap::new();
+    let mut face_counter = BTreeMap::new();
 
     for index in indices {
         let tetra: &Tetrahedron = &tr.elements()[index.0];
