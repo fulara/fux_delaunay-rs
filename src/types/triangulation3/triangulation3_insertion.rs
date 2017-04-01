@@ -171,7 +171,7 @@ mod tests {
     #[test]
     fn testing_using_example_initial_point_set() {
         let nodes: Vec<Point3> = get_example_initial_point_set();
-        let eles: Vec<Tetrahedron> = create_initial_tetra_set(&nodes);
+        let eles: Vec<Tetrahedron> = create_initial_tetra_set(&[0, 1, 2, 3, 4, 5, 6, 7], &nodes);
 
         for index in 0..eles.len() {
             let element_to_which_insert = eles[index].clone();

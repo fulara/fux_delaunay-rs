@@ -1,126 +1,70 @@
 use types::N3Index;
 use types::T4Index;
 use types::Tetrahedron;
+use std::collections::BTreeMap;
 
 use algorithms3::sort_3::sort_3;
 
 pub struct Triangulation3Neighborhood {
-    triangle_neighborhood: Vec<Vec<(N3Index, Vec<(N3Index, Option<T4Index>, Option<T4Index>)>)>>,
+    neighbor_map: BTreeMap<(N3Index, N3Index, N3Index), T4Index>,
 }
 
 impl Triangulation3Neighborhood {
-    pub fn new() -> Triangulation3Neighborhood {
-        Triangulation3Neighborhood { triangle_neighborhood: Vec::new() }
-    }
-
-    pub fn register_tetrahedron(&mut self, tetra: &Tetrahedron, tetra_index: T4Index) {
-        for edge_indices in tetra.faces_as_indices_tuples().iter() {
-            self.register_connection(edge_indices.0, edge_indices.1, edge_indices.2, tetra_index);
-        }
-    }
-
-    pub fn get_neighbor(&self,
-                        p1: N3Index,
-                        p2: N3Index,
-                        p3: N3Index,
-                        tetra_index: T4Index)
-                        -> Option<T4Index> {
-        let (smaller, medium, larger) = sort_3(p1, p2, p3);
-
-        let v = &self.triangle_neighborhood[smaller.0];
-
-        for i in 0..v.len() {
-            let medium_v_item = &v[i];
-
-            if medium_v_item.0 == medium {
-                for i in 0..medium_v_item.1.len() {
-                    let e = &medium_v_item.1[i];
-
-                    if e.0 == larger {
-                        if e.1 == Some(tetra_index) {
-                            return e.2;
-                        } else {
-                            return e.1;
-                        }
-                    }
-                }
-            }
-        }
-
-        None
-    }
-
     pub fn teach_triangles_of_neighborhood(elements: &mut [Tetrahedron]) {
-        let mut neighborhood = Triangulation3Neighborhood::new();
-        for i in 0..elements.len() {
-            let e = &elements[i];
-            neighborhood.register_tetrahedron(e, T4Index(i));
-        }
+        let mut neighborhood = Triangulation3Neighborhood { neighbor_map: BTreeMap::new() };
 
-        for n_smaller_index in 0..neighborhood.triangle_neighborhood.len() {
-            for &(n_medium_index, ref innest_vec) in
-                neighborhood.triangle_neighborhood[n_smaller_index].iter() {
-                for &(n_largest_index, opt_t1, opt_t2) in innest_vec.iter() {
-                    if let (Some(t1), Some(t2)) = (opt_t1, opt_t2) {
-                        {
-                            let el1: &mut Tetrahedron = &mut elements[t1.0];
-                            let neighbor_index =
-                                el1.get_neighbor_index(N3Index(n_smaller_index),
-                                                       n_medium_index,
-                                                       n_largest_index);
+        let len = elements.len();
 
-                            el1.set_neighbor(neighbor_index, Some(t2));
-                        }
-                        {
-                            let el2: &mut Tetrahedron = &mut elements[t2.0];
-                            let neighbor_index =
-                                el2.get_neighbor_index(N3Index(n_smaller_index),
-                                                       n_medium_index,
-                                                       n_largest_index);
-
-                            el2.set_neighbor(neighbor_index, Some(t1));
-                        }
-                    }
-                }
-            }
+        for index in 0..len {
+            neighborhood.add_and_teach(elements, T4Index(index));
         }
     }
 
-    fn register_connection(&mut self,
-                           p1: N3Index,
-                           p2: N3Index,
-                           p3: N3Index,
-                           tetra_index: T4Index) {
-        let (smaller, medium, larger) = sort_3(p1, p2, p3);
+    pub fn teach_selected_elements_of_neighborhood(indices: &[T4Index],
+                                                   elements: &mut [Tetrahedron]) {
+        let mut neighborhood = Triangulation3Neighborhood { neighbor_map: BTreeMap::new() };
 
-        if self.triangle_neighborhood.len() < larger.0 {
-            self.triangle_neighborhood.resize(larger.0, Vec::new());
+        for index in indices.iter() {
+            neighborhood.add_and_teach(elements, *index);
         }
+    }
 
-        let v = &mut self.triangle_neighborhood[smaller.0];
+    fn new() -> Triangulation3Neighborhood {
+        Triangulation3Neighborhood { neighbor_map: BTreeMap::new() }
+    }
 
-        for i in 0..v.len() {
-            let medium_v_item = &mut v[i];
+    fn add_and_teach(&mut self, elements: &mut [Tetrahedron], index: T4Index) {
+        let indices = elements[index.0].faces_as_indices_tuples();
+        for &(n1, n2, n3) in indices.into_iter() {
+            let sorted = sort_3(n1, n2, n3);
 
-            if medium_v_item.0 == medium {
-                for i in 0..medium_v_item.1.len() {
-                    let e = &mut medium_v_item.1[i];
+            let mut found = None;
+            let mut should_insert = false;
 
-                    if e.0 == larger {
-                        assert!(e.1.is_some());
-                        assert!(e.2.is_none());
-                        e.2 = Some(tetra_index);
+            if let Some(val) = self.neighbor_map.get(&sorted) {
+                if *val != index {
+                    found = Some(*val);
+                }
+            } else {
+                should_insert = true;
+            }
 
-                        return;
-                    }
+            if should_insert {
+                self.neighbor_map.insert(sorted, index);
+            }
+
+            if let Some(found) = found {
+                {
+                    let ele: &mut Tetrahedron = &mut elements[found.0];
+                    ele.update_neighbor(n1, n2, n3, Some(index));
                 }
 
-                medium_v_item.1.push((larger, Some(tetra_index), None));
-                return;
+                {
+                    let ele: &mut Tetrahedron = &mut elements[index.0];
+                    ele.update_neighbor(n1, n2, n3, Some(found));
+                }
             }
         }
-
-        v.push((medium, vec![(larger, Some(tetra_index), None)]));
     }
 }
 
@@ -145,53 +89,38 @@ mod tests {
 
         let t0 = Tetrahedron::new(&points, N3Index(0), N3Index(1), N3Index(2), N3Index(3));
         let t1 = Tetrahedron::new(&points, N3Index(1), N3Index(2), N3Index(3), N3Index(4));
+        let mut eles = [t0, t1];
 
-        let mut neighborhood = Triangulation3Neighborhood::new();
-
-        neighborhood.register_tetrahedron(&t0, T4Index(0));
-        neighborhood.register_tetrahedron(&t1, T4Index(1));
+        Triangulation3Neighborhood::teach_triangles_of_neighborhood(&mut eles);
 
         assert_eq!(Option::None,
-                   neighborhood.get_neighbor(N3Index(0), N3Index(1), N3Index(2), T4Index(0)));
+                   eles[0].get_neighbor_for_indices(N3Index(0), N3Index(1), N3Index(2)));
         assert_eq!(Some(T4Index(1)),
-                   neighborhood.get_neighbor(N3Index(1), N3Index(2), N3Index(3), T4Index(0)));
+                   eles[0].get_neighbor_for_indices(N3Index(1), N3Index(2), N3Index(3)));
         assert_eq!(Option::None,
-                   neighborhood.get_neighbor(N3Index(2), N3Index(3), N3Index(0), T4Index(0)));
+                   eles[0].get_neighbor_for_indices(N3Index(2), N3Index(3), N3Index(0)));
         assert_eq!(Option::None,
-                   neighborhood.get_neighbor(N3Index(3), N3Index(0), N3Index(1), T4Index(0)));
+                   eles[0].get_neighbor_for_indices(N3Index(3), N3Index(0), N3Index(1)));
 
         assert_eq!(Some(T4Index(1)),
-                   neighborhood.get_neighbor(N3Index(3), N3Index(2), N3Index(1), T4Index(0)));
+                   eles[0].get_neighbor_for_indices(N3Index(3), N3Index(2), N3Index(1)));
 
 
         assert_eq!(Some(T4Index(0)),
-                   neighborhood.get_neighbor(N3Index(1), N3Index(2), N3Index(3), T4Index(1)));
+                   eles[1].get_neighbor_for_indices(N3Index(1), N3Index(2), N3Index(3)));
         assert_eq!(None,
-                   neighborhood.get_neighbor(N3Index(2), N3Index(3), N3Index(4), T4Index(1)));
+                   eles[1].get_neighbor_for_indices(N3Index(2), N3Index(3), N3Index(4)));
         assert_eq!(None,
-                   neighborhood.get_neighbor(N3Index(3), N3Index(4), N3Index(1), T4Index(1)));
+                   eles[1].get_neighbor_for_indices(N3Index(3), N3Index(4), N3Index(1)));
         assert_eq!(None,
-                   neighborhood.get_neighbor(N3Index(4), N3Index(1), N3Index(2), T4Index(1)));
-
-        let mut tr = vec![t0, t1];
-
-        //todo more tests.
-
-        //TriangulationNeighborhood::teach_triangles_of_neighborhood(&mut tr);
-
-        /*assert_eq!(Some(T4Index(1)), tr[0].get_neighbor_from_index(1));
-        assert_eq!(None, tr[0].get_neighbor_from_index(0));
-        assert_eq!(None, tr[0].get_neighbor_from_index(2));
-
-        assert_eq!(None, tr[1].get_neighbor_from_index(1));
-        assert_eq!(Some(T4Index(0)), tr[1].get_neighbor_from_index(0));
-        assert_eq!(None, tr[1].get_neighbor_from_index(2));*/
+                   eles[1].get_neighbor_for_indices(N3Index(4), N3Index(1), N3Index(2)));
     }
 
     #[test]
     fn testing_neighborhood_with_initiation() {
         let nodes = get_example_initial_point_set();
-        let mut eles: Vec<Tetrahedron> = create_initial_tetra_set(&nodes);
+        let mut eles: Vec<Tetrahedron> = create_initial_tetra_set(&[0, 1, 2, 3, 4, 5, 6, 7],
+                                                                  &nodes);
 
         Triangulation3Neighborhood::teach_triangles_of_neighborhood(&mut eles);
 

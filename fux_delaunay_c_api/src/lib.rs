@@ -16,7 +16,7 @@ fn it_works() {
         let mut triangulation = CApiTriangulation { elements: 0 as *mut CApiElement3, element_count: 0 };
 
         test_c_api(&mut triangulation as *mut CApiTriangulation);
-        let elements: &[CApiElement3] = unsafe { from_raw_parts(triangulation.elements, triangulation.element_count as usize) };
+        let elements: &[CApiElement3] = from_raw_parts(triangulation.elements, triangulation.element_count as usize);
 
         assert_eq!(2, elements.len());
         assert_eq!(CApiElement3 { v: [0, 3, 2] }, elements[0]);

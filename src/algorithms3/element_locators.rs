@@ -149,7 +149,7 @@ mod tests {
     #[test]
     fn finding_element_using_initial_triangulation() {
         let nodes = get_example_initial_point_set();
-        let elements = create_initial_tetra_set(&nodes);
+        let elements = create_initial_tetra_set(&[0, 1, 2, 3, 4, 5, 6, 7],&nodes);
 
         let triangulation = Triangulation3::new_from_prebuilt_triangulation(nodes, elements);
 

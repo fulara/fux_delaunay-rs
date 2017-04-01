@@ -10,50 +10,6 @@ use algorithms3::sort_3::sort_3;
 use std::collections::BTreeMap;
 use std::collections::BTreeSet;
 
-struct BwNeighborTeacher {
-    neighbor_map: BTreeMap<(N3Index, N3Index, N3Index), T4Index>,
-}
-
-impl BwNeighborTeacher {
-    fn new() -> BwNeighborTeacher {
-        BwNeighborTeacher { neighbor_map: BTreeMap::new() }
-    }
-
-    fn add_and_teach(&mut self, triangulation: &mut Triangulation3, index: T4Index) {
-        let indices = triangulation.elements()[index.0].faces_as_indices_tuples();
-        for &(n1, n2, n3) in indices.into_iter() {
-            let sorted = sort_3(n1, n2, n3);
-
-            let mut found = None;
-            let mut should_insert = false;
-
-            if let Some(val) = self.neighbor_map.get(&sorted) {
-                if *val != index {
-                    found = Some(*val);
-                }
-            } else {
-                should_insert = true;
-            }
-
-            if should_insert {
-                self.neighbor_map.insert(sorted, index);
-            }
-
-            if let Some(found) = found {
-                {
-                    let ele: &mut Tetrahedron = &mut triangulation.elements_mut()[found.0];
-                    ele.update_neighbor(n1, n2, n3, Some(index));
-                }
-
-                {
-                    let ele: &mut Tetrahedron = &mut triangulation.elements_mut()[index.0];
-                    ele.update_neighbor(n1, n2, n3, Some(found));
-                }
-            }
-        }
-    }
-}
-
 pub fn insert_into_element_bw(triangulation: &mut Triangulation3,
                               element_index: T4Index,
                               new_node_index: N3Index) {
@@ -67,7 +23,6 @@ pub fn insert_into_element_bw(triangulation: &mut Triangulation3,
 
     let mut new_tetras = Vec::new();
     let mut tetras_which_have_to_be_teached = Vec::new();
-    let mut neighbor_teacher = BwNeighborTeacher::new();
 
     for (index, &((n1, n2, n3), neighbor)) in faces_with_neighbors.iter().enumerate() {
         let mut new_tetra = Tetrahedron::new(triangulation.nodes(), n1, n2, n3, new_node_index);
@@ -92,9 +47,7 @@ pub fn insert_into_element_bw(triangulation: &mut Triangulation3,
         triangulation.elements_mut().push(new_tetras[index].clone());
     }
 
-    for index in tetras_which_have_to_be_teached {
-        neighbor_teacher.add_and_teach(triangulation, index);
-    }
+    Triangulation3Neighborhood::teach_selected_elements_of_neighborhood(&tetras_which_have_to_be_teached, triangulation.elements_mut());
 }
 
 fn find(tr: &Triangulation3, starting_element: T4Index, node: &Point3) -> Vec<T4Index> {
@@ -169,7 +122,7 @@ mod bw_insertion {
     #[test]
     fn testing_find_using_example_set() {
         let example_set = get_example_initial_point_set();
-        let example_tr = create_initial_tetra_set(&example_set);
+        let example_tr = create_initial_tetra_set(&[0, 1, 2, 3, 4, 5, 6, 7], &example_set);
         let tr = Triangulation3::new_from_prebuilt_triangulation(example_set.clone(),
                                                                  example_tr.clone());
 
@@ -204,7 +157,7 @@ mod bw_insertion {
     #[test]
     fn testing_face_uniquification_using_example_set() {
         let example_set = get_example_initial_point_set();
-        let example_tr = create_initial_tetra_set(&example_set);
+        let example_tr = create_initial_tetra_set(&[0, 1, 2, 3, 4, 5, 6, 7], &example_set);
         let tr = Triangulation3::new_from_prebuilt_triangulation(example_set.clone(),
                                                                  example_tr.clone());
 

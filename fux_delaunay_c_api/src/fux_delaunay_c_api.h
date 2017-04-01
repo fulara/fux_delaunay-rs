@@ -27,7 +27,7 @@ struct CApiTriangulation {
 };
 typedef struct CApiTriangulation CApiTriangulation;
 
-void generate_triangulation(CApiPoint2 *,size_t, CApiTriangulation*);
+void generate_triangulation2(CApiPoint2 *,size_t, CApiTriangulation*);
 
 #ifdef __cplusplus
 }

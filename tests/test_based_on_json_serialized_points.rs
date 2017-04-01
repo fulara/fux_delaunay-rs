@@ -6,7 +6,7 @@ use fux_delaunay::c_api::*;
 
 #[test]
 fn test_300x300_truktura_500_json() {
-    let data = match deserialize_data("tests/data/300x300_truktura_500.json") {
+    let data = match deserialize_data2("tests/data/300x300_truktura_500.json") {
         Ok(d) => d,
         Err(_) => panic!("failed to open file."),
     };

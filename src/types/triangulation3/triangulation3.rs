@@ -5,6 +5,8 @@ use types::T4Index;
 use algorithms3::element_locators::*;
 use super::triangulation3_insertion;
 use super::triangulation3_bw_insertion;
+use super::triangulation3_utilities::find_corner_nodes3;
+use super::triangulation3_initiation::create_initial_tetra_set;
 
 use super::triangulation3_neighborhood::Triangulation3Neighborhood;
 
@@ -27,6 +29,56 @@ impl Triangulation3 {
 
         Triangulation3Neighborhood::teach_triangles_of_neighborhood(&mut tr.elements);
         tr
+    }
+
+    #[inline]
+    pub fn new(nodes: &[Point3]) -> Triangulation3 {
+        println!("got here.");
+        let corner_nodes: [usize; 8] = find_corner_nodes3(nodes);
+        let mut indices_except_corner: Vec<usize> = Vec::new();
+
+        for i in 0..nodes.len() {
+            if !corner_nodes.iter().any(|n| *n == i) {
+                indices_except_corner.push(i);
+            }
+        }
+
+        indices_except_corner.sort_by(|a, b| if nodes[*a].x < nodes[*b].x {
+                                          ::std::cmp::Ordering::Less
+                                      } else if nodes[*a].x > nodes[*b].x {
+            ::std::cmp::Ordering::Greater
+        } else {
+            if nodes[*a].y < nodes[*b].y {
+                ::std::cmp::Ordering::Less
+            } else if nodes[*a].y > nodes[*b].y {
+                ::std::cmp::Ordering::Greater
+            } else {
+                if nodes[*a].z < nodes[*b].z {
+                    ::std::cmp::Ordering::Less
+                } else if nodes[*a].z > nodes[*b].z {
+                    ::std::cmp::Ordering::Greater
+                } else {
+                    panic!("Triangulation received equal nodes. node: {:?}", nodes[*a]);
+                }
+            }
+        });
+
+        let nodes = Vec::from(nodes);
+        let mut eles = create_initial_tetra_set(&corner_nodes, &nodes);
+
+        Triangulation3Neighborhood::teach_triangles_of_neighborhood(&mut eles);
+        let mut triangulation = Triangulation3 {
+            elements: eles,
+            last_added_element_index: T4Index(0),
+            nodes: nodes,
+        };
+
+        for index in indices_except_corner.into_iter() {
+            println!("Invokking that...");
+            triangulation.insert_into_triangulation(N3Index(index));
+        }
+
+        triangulation
     }
 
     #[inline]
@@ -57,6 +109,7 @@ impl Triangulation3 {
 
     #[inline]
     fn insert_into_triangulation(&mut self, new_node_index: N3Index) {
+        println!("throwing unimplemented0.");
         let location_result = locate_element_containing(self.last_added_element_index,
                                                         &self.elements,
                                                         &self.nodes,
@@ -74,7 +127,18 @@ impl Triangulation3 {
                 //lawson_flipping::propagating_flip(self, new_node_index, t2_index);
                 //lawson_flipping::propagating_flip(self, new_node_index, t3_index);
             }
-            _ => unimplemented!(),
+            LocationResult::OnFace(ele_index, _) => {
+                self.last_added_element_index = ele_index;
+                triangulation3_bw_insertion::insert_into_element_bw(self,
+                                                                    ele_index,
+                                                                    new_node_index);
+            }
+            LocationResult::OnFaces(ele_index, _, _) => {
+                self.last_added_element_index = ele_index;
+                triangulation3_bw_insertion::insert_into_element_bw(self,
+                                                                    ele_index,
+                                                                    new_node_index);
+            }
         }
     }
 }
