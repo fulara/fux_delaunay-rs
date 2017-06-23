@@ -76,12 +76,17 @@ impl Triangulation3 {
             nodes: nodes,
         };
 
+        let mut x = 0 ;
         for index in indices_except_corner.into_iter() {
-            println!("Invokking that...");
+            println!("Invokking that... {:?}", x);
+            if x == 600 {
+                break;
+            }
+            x += 1;
             triangulation.insert_into_triangulation(N3Index(index));
         }
 
-        remove_fake_nodes(&mut triangulation, &fake_indices);
+//        remove_fake_nodes(&mut triangulation, &fake_indices);
 
         triangulation
     }

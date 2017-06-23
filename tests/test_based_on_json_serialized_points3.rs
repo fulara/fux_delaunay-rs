@@ -3,6 +3,7 @@ extern crate rand;
 
 use fux_delaunay::types::*;
 use fux_delaunay::c_api::*;
+use fux_delaunay::io::abaqus_3d_write::write_3d_to_abaqus_format;
 
 #[test]
 fn data_100x100x100() {
@@ -17,5 +18,6 @@ fn data_100x100x100() {
         nodes.push(Point3::new(p.x, p.y, p.z));
     }
 
-    let _ = Triangulation3::new(&nodes);
+    let tr = Triangulation3::new(&nodes);
+    write_3d_to_abaqus_format("tests/tests_results3/data_100x100x100.inp", &tr);
 }

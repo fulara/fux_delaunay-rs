@@ -20,6 +20,7 @@ pub fn locate_element_containing(start_lookup_at: T4Index,
                                  nodes: &[Point3],
                                  p: &Point3)
                                  -> LocationResult {
+    let mut previous_index = start_lookup_at;
     let mut ele_index = start_lookup_at;
 
     loop {
@@ -44,18 +45,36 @@ pub fn locate_element_containing(start_lookup_at: T4Index,
                 break;
             }
 
-            let edge = ele.faces_as_points_tuples(nodes)[current_face];
+            //let edge = if(ele.faces_as_points_tuples(nodes)[current_face];
 
-            match math::side_of_plane(edge.0, edge.1, edge.2, p) {
+            let match_result = match current_face {
+                0 => math::side_of_plane(p, ele.b(nodes), ele.c(nodes), ele.d(nodes)),
+                1 => math::side_of_plane(ele.a(nodes), p, ele.c(nodes), ele.d(nodes)),
+                2 => math::side_of_plane(ele.a(nodes), ele.b(nodes), p, ele.d(nodes)),
+                _ => math::side_of_plane(ele.a(nodes), ele.b(nodes), ele.c(nodes), p),
+            };
+
+            match current_face {
+                0 => println!("performed match on {:?} {:?} {:?} {:?}", p, ele.b(nodes), ele.c(nodes), ele.d(nodes)),
+                1 => println!("performed match on {:?} {:?} {:?} {:?}", ele.a(nodes), p, ele.c(nodes), ele.d(nodes)),
+                2 => println!("performed match on {:?} {:?} {:?} {:?}", ele.a(nodes), ele.b(nodes), p, ele.d(nodes)),
+                _ => println!("performed match on {:?} {:?} {:?} {:?}", ele.a(nodes), ele.b(nodes), ele.c(nodes), p),
+            };
+
+            match match_result {//math::side_of_plane(edge.0, edge.1, edge.2, p) {
                 math::SideOfPlane::Left => {
                     assert!(ele.get_neighbor_from_index(current_face).is_some());
-                    println!("skipping to {:?} from {:?}. jumping from {:?} to {:?}",
-                             ele.faces_as_indices_tuples()[current_face],
-                             ele,
-                             ele_index.0,
-                             ele.get_neighbor_from_index(current_face).unwrap());
-                    ele_index = ele.get_neighbor_from_index(current_face).unwrap();
-                    break;
+
+                    if ele.get_neighbor_from_index(current_face).unwrap() != previous_index {
+                        println!("skipping to {:?} from {:?}. jumping from {:?} to {:?}",
+                                 ele.faces_as_indices_tuples()[current_face],
+                                 ele,
+                                 ele_index.0,
+                                 ele.get_neighbor_from_index(current_face).unwrap());
+                        previous_index = ele_index;
+                        ele_index = ele.get_neighbor_from_index(current_face).unwrap();
+                        break;
+                    }
                 }
                 math::SideOfPlane::OnPlane => {
                     if on_faces_found.is_some() {

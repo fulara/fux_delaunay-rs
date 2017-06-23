@@ -199,20 +199,20 @@ impl Tetrahedron {
 
     #[inline]
     pub fn faces_as_indices_tuples(&self) -> [(N3Index, N3Index, N3Index); 4] {
-        [(self.index_a(), self.index_b(), self.index_c()),
-         (self.index_b(), self.index_a(), self.index_d()),
-         (self.index_d(), self.index_c(), self.index_b()),
-         (self.index_d(), self.index_a(), self.index_c())]
+        [(self.index_b(), self.index_c(), self.index_d()),
+         (self.index_a(), self.index_c(), self.index_d()),
+         (self.index_a(), self.index_b(), self.index_d()),
+         (self.index_a(), self.index_b(), self.index_c())]
     }
 
     #[inline]
     pub fn faces_as_points_tuples<'a>(&self,
                                       points: &'a [Point3])
                                       -> [(&'a Point3, &'a Point3, &'a Point3); 4] {
-        [(self.a(points), self.b(points), self.c(points)),
-         (self.b(points), self.a(points), self.d(points)),
-         (self.d(points), self.c(points), self.b(points)),
-         (self.d(points), self.a(points), self.c(points))]
+        [(self.b(points), self.c(points), self.d(points)),
+         (self.a(points), self.c(points), self.d(points)),
+         (self.a(points), self.b(points), self.d(points)),
+         (self.a(points), self.b(points), self.c(points))]
     }
 
     #[inline]
@@ -322,7 +322,7 @@ impl Tetrahedron {
 }
 
 #[cfg(test)]
-mod tests {
+mod tetrahedron_tests {
     use super::*;
     use types::Tetrahedron;
 
@@ -336,9 +336,9 @@ mod tests {
         let tr = Tetrahedron::new(&points, N3Index(0), N3Index(1), N3Index(2), N3Index(3));
 
         assert_eq!(*tr.a(&points), points[0]);
-        assert_eq!(*tr.b(&points), points[3]);
-        assert_eq!(*tr.c(&points), points[2]);
-        assert_eq!(*tr.d(&points), points[1]);
+        assert_eq!(*tr.b(&points), points[1]);
+        assert_eq!(*tr.c(&points), points[3]);
+        assert_eq!(*tr.d(&points), points[2]);
 
         let correctly_ordered =
             Tetrahedron::new(&points, N3Index(0), N3Index(3), N3Index(2), N3Index(1));
@@ -358,11 +358,24 @@ mod tests {
 
         let tr = Tetrahedron::new(&points, N3Index(0), N3Index(1), N3Index(2), N3Index(3));
 
-        assert_eq!(0, tr.get_neighbor_index(N3Index(0), N3Index(3), N3Index(2)));
-        assert_eq!(0, tr.get_neighbor_index(N3Index(0), N3Index(2), N3Index(3)));
-        assert_eq!(0, tr.get_neighbor_index(N3Index(3), N3Index(0), N3Index(2)));
-        assert_eq!(0, tr.get_neighbor_index(N3Index(3), N3Index(2), N3Index(0)));
-        assert_eq!(0, tr.get_neighbor_index(N3Index(2), N3Index(0), N3Index(3)));
-        assert_eq!(0, tr.get_neighbor_index(N3Index(2), N3Index(3), N3Index(0)));
+        assert_eq!(1, tr.get_neighbor_index(N3Index(0), N3Index(3), N3Index(2)));
+        assert_eq!(1, tr.get_neighbor_index(N3Index(0), N3Index(2), N3Index(3)));
+        assert_eq!(1, tr.get_neighbor_index(N3Index(3), N3Index(0), N3Index(2)));
+        assert_eq!(1, tr.get_neighbor_index(N3Index(3), N3Index(2), N3Index(0)));
+        assert_eq!(1, tr.get_neighbor_index(N3Index(2), N3Index(0), N3Index(3)));
+        assert_eq!(1, tr.get_neighbor_index(N3Index(2), N3Index(3), N3Index(0)));
+    }
+
+    #[test]
+    fn point_outside_test() {
+        let points = vec![Point3::new(0., 1.0999999999999996, 99.),
+                          Point3::new(-9.9, -9.9, 108.9),
+                          Point3::new(0.0, 43.5485784418582, 96.46007777380972),
+                          Point3::new(-9.9, 108.9, 108.9),
+                          Point3::new(0., 43.700000000000294, 99.)];
+
+        let tr = Tetrahedron::new(&points, N3Index(0), N3Index(1), N3Index(2), N3Index(3));
+
+        assert_eq!(true, tr.is_point_outside(&points[4], &points));
     }
 }
