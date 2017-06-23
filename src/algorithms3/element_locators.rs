@@ -4,6 +4,7 @@ use types::Tetrahedron;
 use types::Point3;
 
 use math;
+use std::f64;
 
 #[derive(Debug, Eq, PartialEq)]
 pub enum LocationResult {
@@ -28,8 +29,17 @@ pub fn locate_element_containing(start_lookup_at: T4Index,
         let mut on_face_found: Option<usize> = None;
         let mut on_faces_found: Option<(usize, usize)> = None;
 
+
         loop {
-            println!("am i cycling here? {:?} ele_index {:?}", current_face, ele_index);
+            println!("am i cycling here? {:?} ele_index {:?}, p1{:?} p2{:?} p3{:?} p4{:?} p{:?}",
+                     current_face,
+                     ele_index,
+                     elements[ele_index.0].a(nodes),
+                     elements[ele_index.0].b(nodes),
+                     elements[ele_index.0].c(nodes),
+                     elements[ele_index.0].d(nodes),
+                     p);
+            ::std::thread::sleep_ms(1);
             if current_face == 4 {
                 break;
             }
@@ -39,7 +49,11 @@ pub fn locate_element_containing(start_lookup_at: T4Index,
             match math::side_of_plane(edge.0, edge.1, edge.2, p) {
                 math::SideOfPlane::Left => {
                     assert!(ele.get_neighbor_from_index(current_face).is_some());
-                    println!("skipping to {:?} from {:?}. jumping from {:?} to {:?}", ele.faces_as_indices_tuples()[current_face], ele, ele_index.0, ele.get_neighbor_from_index(current_face).unwrap());
+                    println!("skipping to {:?} from {:?}. jumping from {:?} to {:?}",
+                             ele.faces_as_indices_tuples()[current_face],
+                             ele,
+                             ele_index.0,
+                             ele.get_neighbor_from_index(current_face).unwrap());
                     ele_index = ele.get_neighbor_from_index(current_face).unwrap();
                     break;
                 }
@@ -149,7 +163,7 @@ mod tests {
     #[test]
     fn finding_element_using_initial_triangulation() {
         let nodes = get_example_initial_point_set();
-        let elements = create_initial_tetra_set(&[0, 1, 2, 3, 4, 5, 6, 7],&nodes);
+        let elements = create_initial_tetra_set(&[0, 1, 2, 3, 4, 5, 6, 7], &nodes);
 
         let triangulation = Triangulation3::new_from_prebuilt_triangulation(nodes, elements);
 

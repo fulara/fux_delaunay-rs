@@ -19,7 +19,8 @@ pub fn insert_into_element_bw(triangulation: &mut Triangulation3,
     let faces_with_neighbors = select_faces_which_exist_only_once(triangulation,
                                                                   &elements_to_remove);
 
-    assert!(faces_with_neighbors.len() >= elements_to_remove.len());
+//    println!("faces_with_neighbors.len() {:?}, elements_to_remove.len() {:?}", faces_with_neighbors.len(),elements_to_remove.len());
+//    assert!(faces_with_neighbors.len() >= elements_to_remove.len());
 
     let mut new_tetras = Vec::new();
     let mut tetras_which_have_to_be_teached = Vec::new();
@@ -38,6 +39,10 @@ pub fn insert_into_element_bw(triangulation: &mut Triangulation3,
     for original_element_index in elements_to_remove {
         triangulation.elements_mut()[original_element_index.0] = new_tetras[index].clone();
         index += 1;
+
+        if index >= faces_with_neighbors.len() {
+            break;
+        }
 
         tetras_which_have_to_be_teached.push(original_element_index);
     }

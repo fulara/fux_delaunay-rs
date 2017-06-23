@@ -37,7 +37,7 @@ pub struct CApiTriangulation3 {
 
 fn serialize_and_save_data3(nodes: &Vec<CApiPoint3>) {
     println!("serializing and saving data.");
-    let mut data: File = File::create("input_points_from_c.json").unwrap();
+    let mut data: File = File::create("input_points3_from_c.json").unwrap();
     let _ = data.write(json::encode(&nodes).unwrap().as_bytes());
     println!("serialized!");
 }
@@ -51,7 +51,7 @@ pub fn deserialize_data3(path_to_data: &str) -> ::std::io::Result<Vec<CApiPoint3
     Ok(json::decode(&String::from_utf8(buffor).unwrap()).unwrap())
 }
 
-/*
+
 #[no_mangle]
 pub fn generate_triangulation3(points: *mut CApiPoint3,
                                point_count: libc::int32_t,
@@ -80,4 +80,4 @@ pub fn generate_triangulation3(points: *mut CApiPoint3,
         (*triangulation_data).elements = raw_slice as *mut CApiElement4;
         (*triangulation_data).element_count = element_count;
     }
-} */
+}

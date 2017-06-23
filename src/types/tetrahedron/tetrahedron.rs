@@ -23,11 +23,122 @@ impl Tetrahedron {
                 v: [a, b, c, d],
                 n: [None, None, None, None],
             }
-        } else {
+        } else if is_ordered_correctly(&points[a.0], &points[b.0], &points[d.0], &points[c.0]) {
+            Tetrahedron {
+                v: [a, b, d, c],
+                n: [None, None, None, None],
+            }
+        } else if is_ordered_correctly(&points[a.0], &points[c.0], &points[b.0], &points[d.0]) {
+            Tetrahedron {
+                v: [a, c, b, d],
+                n: [None, None, None, None],
+            }
+        } else if is_ordered_correctly(&points[a.0], &points[c.0], &points[d.0], &points[b.0]) {
+            Tetrahedron {
+                v: [a, c, d, b],
+                n: [None, None, None, None],
+            }
+        } else if is_ordered_correctly(&points[a.0], &points[d.0], &points[b.0], &points[c.0]) {
+            Tetrahedron {
+                v: [a, d, b, c],
+                n: [None, None, None, None],
+            }
+        } else if is_ordered_correctly(&points[a.0], &points[d.0], &points[c.0], &points[b.0]) {
             Tetrahedron {
                 v: [a, d, c, b],
                 n: [None, None, None, None],
             }
+        } else if is_ordered_correctly(&points[b.0], &points[a.0], &points[c.0], &points[d.0]) {
+            Tetrahedron {
+                v: [b, a, c, d],
+                n: [None, None, None, None],
+            }
+        } else if is_ordered_correctly(&points[b.0], &points[a.0], &points[d.0], &points[c.0]) {
+            Tetrahedron {
+                v: [b, a, d, c],
+                n: [None, None, None, None],
+            }
+        } else if is_ordered_correctly(&points[b.0], &points[c.0], &points[a.0], &points[d.0]) {
+            Tetrahedron {
+                v: [b, c, a, d],
+                n: [None, None, None, None],
+            }
+        } else if is_ordered_correctly(&points[b.0], &points[c.0], &points[d.0], &points[a.0]) {
+            Tetrahedron {
+                v: [b, c, d, b],
+                n: [None, None, None, None],
+            }
+        } else if is_ordered_correctly(&points[b.0], &points[d.0], &points[a.0], &points[c.0]) {
+            Tetrahedron {
+                v: [b, d, a, c],
+                n: [None, None, None, None],
+            }
+        } else if is_ordered_correctly(&points[b.0], &points[d.0], &points[c.0], &points[a.0]) {
+            Tetrahedron {
+                v: [b, d, c, b],
+                n: [None, None, None, None],
+            }
+        } else if is_ordered_correctly(&points[c.0], &points[b.0], &points[a.0], &points[d.0]) {
+            Tetrahedron {
+                v: [c, b, a, d],
+                n: [None, None, None, None],
+            }
+        } else if is_ordered_correctly(&points[c.0], &points[b.0], &points[d.0], &points[a.0]) {
+            Tetrahedron {
+                v: [c, b, d, c],
+                n: [None, None, None, None],
+            }
+        } else if is_ordered_correctly(&points[c.0], &points[a.0], &points[b.0], &points[d.0]) {
+            Tetrahedron {
+                v: [c, a, b, d],
+                n: [None, None, None, None],
+            }
+        } else if is_ordered_correctly(&points[c.0], &points[a.0], &points[d.0], &points[b.0]) {
+            Tetrahedron {
+                v: [c, a, d, b],
+                n: [None, None, None, None],
+            }
+        } else if is_ordered_correctly(&points[c.0], &points[d.0], &points[b.0], &points[a.0]) {
+            Tetrahedron {
+                v: [c, d, b, c],
+                n: [None, None, None, None],
+            }
+        } else if is_ordered_correctly(&points[c.0], &points[d.0], &points[a.0], &points[b.0]) {
+            Tetrahedron {
+                v: [c, d, a, b],
+                n: [None, None, None, None],
+            }
+        } else if is_ordered_correctly(&points[d.0], &points[b.0], &points[c.0], &points[a.0]) {
+            Tetrahedron {
+                v: [d, b, c, d],
+                n: [None, None, None, None],
+            }
+        } else if is_ordered_correctly(&points[d.0], &points[b.0], &points[a.0], &points[c.0]) {
+            Tetrahedron {
+                v: [d, b, a, c],
+                n: [None, None, None, None],
+            }
+        } else if is_ordered_correctly(&points[d.0], &points[c.0], &points[b.0], &points[a.0]) {
+            Tetrahedron {
+                v: [d, c, b, d],
+                n: [None, None, None, None],
+            }
+        } else if is_ordered_correctly(&points[d.0], &points[c.0], &points[a.0], &points[b.0]) {
+            Tetrahedron {
+                v: [d, c, a, b],
+                n: [None, None, None, None],
+            }
+        } else if is_ordered_correctly(&points[d.0], &points[a.0], &points[b.0], &points[c.0]) {
+            Tetrahedron {
+                v: [d, a, b, c],
+                n: [None, None, None, None],
+            }
+        } else {
+            panic!("never found good match a{:?} b{:?} c{:?} d{:?}",
+                   points[a.0],
+                   points[b.0],
+                   points[c.0],
+                   points[d.0])
         }
     }
 

@@ -32,23 +32,13 @@ fn trivial_test3_2() {
 fn trivial_test3_3() {
     println!("before tr.");
     let mut nodes: Vec<_> = vec![Point3::new(0., 0., 0.),
-                                      Point3::new(0., 1., 0.),
-                                      Point3::new(1., 1., 0.),
-                                      Point3::new(1., 0., 0.),
-                                      Point3::new(0., 0., 1.),
-                                      Point3::new(0., 1., 1.),
-                                      Point3::new(1., 1., 1.),
-                                      Point3::new(1., 0., 1.),
-
-                                 Point3::new(-1., -1., -1.),
-                                 Point3::new(-1., 2., -1.),
-                                 Point3::new(2., 2., -1.),
-                                 Point3::new(2., -1., -1.),
-                                 Point3::new(-1., -1., 2.),
-                                 Point3::new(-1., 2., 2.),
-                                 Point3::new(2., 2., 2.),
-                                 Point3::new(2., -1., 2.)
-    ];
+                                 Point3::new(0., 1., 0.),
+                                 Point3::new(1., 1., 0.),
+                                 Point3::new(1., 0., 0.),
+                                 Point3::new(0., 0., 1.),
+                                 Point3::new(0., 1., 1.),
+                                 Point3::new(1., 1., 1.),
+                                 Point3::new(1., 0., 1.)];
 
     println!("before tr.");
     nodes.push(Point3::new(0.4, 0., 0.5));

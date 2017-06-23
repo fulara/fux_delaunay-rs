@@ -4,7 +4,7 @@ version = "0.1.0"
 authors = ["fulara <ntszar@gmail.com>"]
 
 #[lib]
-#crate-type= ["dylib"]
+#crate-type= ["staticlib"]
 
 [dependencies]
 cgmath = "0.12.0"

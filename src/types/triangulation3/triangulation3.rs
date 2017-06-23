@@ -7,6 +7,7 @@ use super::triangulation3_insertion;
 use super::triangulation3_bw_insertion;
 use super::triangulation3_utilities::find_corner_nodes3;
 use super::triangulation3_initiation::create_initial_tetra_set;
+use super::triangulation3_fake_nodes::*;
 
 use super::triangulation3_neighborhood::Triangulation3Neighborhood;
 
@@ -34,7 +35,9 @@ impl Triangulation3 {
     #[inline]
     pub fn new(nodes: &[Point3]) -> Triangulation3 {
         println!("got here.");
-        let corner_nodes: [usize; 8] = find_corner_nodes3(nodes);
+        let mut nodes = Vec::from(nodes);
+        let fake_indices = add_fake_nodes(&mut nodes);
+        let corner_nodes: [usize; 8] = find_corner_nodes3(&nodes);
         let mut indices_except_corner: Vec<usize> = Vec::new();
 
         for i in 0..nodes.len() {
@@ -58,7 +61,7 @@ impl Triangulation3 {
                 } else if nodes[*a].z > nodes[*b].z {
                     ::std::cmp::Ordering::Greater
                 } else {
-                    panic!("Triangulation received equal nodes. node: {:?}", nodes[*a]);
+                    panic!("Triangulation received equal nodes. node a: {:?}, node b: {:?}", nodes[*a], nodes[*b]);
                 }
             }
         });
@@ -78,12 +81,19 @@ impl Triangulation3 {
             triangulation.insert_into_triangulation(N3Index(index));
         }
 
+        remove_fake_nodes(&mut triangulation, &fake_indices);
+
         triangulation
     }
 
     #[inline]
     pub fn nodes(&self) -> &Vec<Point3> {
         &self.nodes
+    }
+
+    #[inline]
+    pub fn nodes_mut(&mut self) -> &mut Vec<Point3> {
+        &mut self.nodes
     }
 
     #[inline]
@@ -109,7 +119,6 @@ impl Triangulation3 {
 
     #[inline]
     fn insert_into_triangulation(&mut self, new_node_index: N3Index) {
-        println!("throwing unimplemented0.");
         let location_result = locate_element_containing(self.last_added_element_index,
                                                         &self.elements,
                                                         &self.nodes,
